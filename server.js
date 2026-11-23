@@ -247,10 +247,16 @@ fastify.get('/api/settings', async () => {
 
 // Serve static files manually
 fastify.get('/*', async (request, reply) => {
-  let filePath = request.url;
+  let filePath = request.url.split('?')[0]; // strip query params
   if (filePath === '/') filePath = 'index.html';
   // Strip leading slash for path.join
   if (filePath.startsWith('/')) filePath = filePath.slice(1);
+
+  // Prevent path traversal
+  const resolved = resolve(PUBLIC_DIR, filePath);
+  if (!resolved.startsWith(resolve(PUBLIC_DIR))) {
+    return reply.code(403).send('Forbidden');
+  }
 
   const fullPath = join(PUBLIC_DIR, filePath);
   const ext = fullPath.slice(fullPath.lastIndexOf('.'));
