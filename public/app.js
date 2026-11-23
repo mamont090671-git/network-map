@@ -205,11 +205,8 @@ function renderLinks() {
     delBtn.setAttribute('stroke', '#fff');
     delBtn.setAttribute('stroke-width', '2');
     delBtn.style.pointerEvents = 'all';
-    delBtn.style.opacity = '0';
-    delBtn.style.transition = 'opacity .2s';
+    delBtn.style.opacity = '1';
     delBtn.dataset.linkId = link.id;
-    delBtn.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
-    delBtn.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
     delBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (confirm(`Удалить связь?`)) {
@@ -228,11 +225,8 @@ function renderLinks() {
     delText.setAttribute('font-weight', 'bold');
     delText.setAttribute('pointer-events', 'none');
     delText.textContent = '✕';
-    delText.style.opacity = '0';
-    delText.style.transition = 'opacity .2s';
+    delText.style.opacity = '1';
     delText.dataset.linkId = link.id;
-    delText.addEventListener('mouseenter', () => delText.style.opacity = '1');
-    delText.addEventListener('mouseleave', () => delText.style.opacity = '0');
     svgLayer.appendChild(delText);
   });
   let defs = svgLayer.querySelector('defs');
