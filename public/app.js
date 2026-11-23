@@ -168,7 +168,12 @@ function renderLinks() {
     path.setAttribute('fill', 'none');
     path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
     path.setAttribute('opacity', '0.8');
+    path.setAttribute('pointer-events', 'stroke');
+    path.style.cursor = 'pointer';
     path.dataset.linkId = link.id;
+    // Блокируем всплытие mousedown, чтобы не начать пан/драг при клике на связь
+    path.addEventListener('mousedown', e => { e.stopPropagation(); });
+    // Клик — контекстное меню
     path.addEventListener('click', (e) => {
       e.stopPropagation();
       let px = e.clientX, py = e.clientY;
@@ -179,6 +184,11 @@ function renderLinks() {
       linkPopup.style.top = py + 'px';
       linkPopup.classList.add('open');
       editingLink = link;
+    });
+    // Дабл-клик — сразу редактировать
+    path.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      editLink();
     });
     svgLayer.appendChild(path);
     // Красная кнопка ✕ в середине линии
@@ -192,8 +202,10 @@ function renderLinks() {
     delBtn.setAttribute('stroke', '#fff');
     delBtn.setAttribute('stroke-width', '2');
     delBtn.style.pointerEvents = 'all';
+    delBtn.style.cursor = 'pointer';
     delBtn.style.opacity = '1';
     delBtn.dataset.linkId = link.id;
+    delBtn.addEventListener('mousedown', e => { e.stopPropagation(); });
     delBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       console.log('CIRCLE CLICK FIRED!', link.id, midX, midY);
