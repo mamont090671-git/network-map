@@ -122,9 +122,9 @@ function renderNodes() {
     el.innerHTML = `
       <div class="node-header"><span class="icon">${icon}</span><span>${esc(n.label)}</span></div>
       <div class="node-body"><span class="ip-col"><span class="ip-label">v4</span><span>${n.ip_nebula || '—'}</span>${n.port_nebula ? '<span class="ip-port">:' + n.port_nebula + '</span>' : ''}</span></div>
-      <div class="node-body"><span class="ip-col"><span class="ip-label">v6</span><span>${n.ipv6_nebula || '—'}</span></span></span></div>
-      <div class="node-body"><span class="ip-col"><span class="ip-label">pub</span><span>${n.ip_public || '—'}</span></span></span></div>
-      <div class="node-body"><span class="ip-col"><span class="ip-label">loc</span><span>${n.ip_local || '—'}</span></span></span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">v6</span><span>${n.ipv6_nebula || '—'}</span></span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">pub</span><span>${n.ip_public || '—'}</span></span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">loc</span><span>${n.ip_local || '—'}</span></span></div>
       <div class="node-actions">
         <button class="edit" onclick="event.stopPropagation(); openEditNode('${n.id}')" title="Редактировать">✏</button>
         <button class="del" onclick="event.stopPropagation(); deleteNode('${n.id}')" title="Удалить">✕</button>
@@ -210,6 +210,22 @@ function renderLinks() {
 
     group.appendChild(hitPath);
     group.appendChild(path);
+
+    // Подпись связи
+    if (link.label) {
+      const midX = (src.x + tgt.x) / 2;
+      const midY = (src.y + tgt.y) / 2;
+      const labelEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      labelEl.setAttribute('x', midX);
+      labelEl.setAttribute('y', midY - 6);
+      labelEl.setAttribute('text-anchor', 'middle');
+      labelEl.setAttribute('fill', color);
+      labelEl.setAttribute('font-size', '11');
+      labelEl.setAttribute('font-family', 'monospace');
+      labelEl.setAttribute('pointer-events', 'none');
+      labelEl.textContent = link.label;
+      group.appendChild(labelEl);
+    }
 
     // Обработчики кликов на широкой зоне hitPath
     hitPath.addEventListener('mousedown', e => { e.stopPropagation(); });

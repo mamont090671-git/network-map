@@ -266,11 +266,8 @@ fastify.get('/*', async (request, reply) => {
     return { error: 'Not found' };
   }
 
-  reply.type(MIME[ext] || 'application/octet-stream');
-  // Cache-bust JS
-  if (ext === '.js') reply.header('Cache-Control', 'no-cache');
-  if (ext === '.html') reply.header('Cache-Control', 'no-cache');
-  reply.type(MIME[ext] || 'application/octet-stream');
+  reply.header('Cache-Control', 'no-cache');
+  if (ext === '.js' || ext === '.html') reply.header('Cache-Control', 'no-cache');
   return reply.send(createReadStream(fullPath));
 });
 
