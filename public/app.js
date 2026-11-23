@@ -105,8 +105,11 @@ function renderAll() {
 }
 
 function updateViewport() {
-  canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  const t = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  canvas.style.transform = t;
   canvas.style.transformOrigin = '0 0';
+  const svg = document.getElementById('svg-layer');
+  if (svg) { svg.style.transform = t; svg.style.transformOrigin = '0 0'; }
 }
 
 function renderNodes() {
