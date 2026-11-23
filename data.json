@@ -146,15 +146,6 @@
       "created_at": "2026-11-23T08:20:14.796Z"
     },
     {
-      "id": "04261406-37fb-4095-93c5-616a6b60b85f",
-      "source": "31ac053a-a6de-451a-9fac-03a8dc6a139f",
-      "target": "676b3adc-9633-44c9-ba24-110d07f5a406",
-      "type": "physical",
-      "label": "",
-      "details": "",
-      "created_at": "2026-11-23T08:22:16.814Z"
-    },
-    {
       "id": "dbe095fa-41b0-4a11-9a74-790cfc726346",
       "source": "676b3adc-9633-44c9-ba24-110d07f5a406",
       "target": "102efb05-a8f1-4497-ac1c-b3e3069486dd",
@@ -164,15 +155,6 @@
       "created_at": "2026-11-23T08:22:30.285Z"
     },
     {
-      "id": "7dcbc05a-4609-46b6-a5aa-c8a2b7158a3d",
-      "source": "31ac053a-a6de-451a-9fac-03a8dc6a139f",
-      "target": "cd943948-fa31-493a-953f-5d0d9426bbe3",
-      "type": "physical",
-      "label": "",
-      "details": "",
-      "created_at": "2026-11-23T08:55:49.277Z"
-    },
-    {
       "id": "63500c18-7a96-45af-9257-7027a112cad2",
       "source": "cd943948-fa31-493a-953f-5d0d9426bbe3",
       "target": "8198d8a6-17ff-4887-aa2f-370d6da218af",
@@ -180,24 +162,6 @@
       "label": "",
       "details": "",
       "created_at": "2026-11-23T10:02:04.915Z"
-    },
-    {
-      "id": "8637351a-8a14-4af0-803c-28924d7bcdfe",
-      "source": "31ac053a-a6de-451a-9fac-03a8dc6a139f",
-      "target": "cd943948-fa31-493a-953f-5d0d9426bbe3",
-      "type": "physical",
-      "label": "",
-      "details": "",
-      "created_at": "2026-11-23T10:02:48.601Z"
-    },
-    {
-      "id": "a6ce7588-3b11-4709-b134-32cf137e80b5",
-      "source": "676b3adc-9633-44c9-ba24-110d07f5a406",
-      "target": "102efb05-a8f1-4497-ac1c-b3e3069486dd",
-      "type": "wifi",
-      "label": "",
-      "details": "",
-      "created_at": "2026-11-23T10:02:59.674Z"
     }
   ]
 }

@@ -173,7 +173,7 @@ function renderLinks() {
     const cp1x = src.x + dx * 0.4, cp1y = src.y;
     const cp2x = tgt.x - dx * 0.4, cp2y = tgt.y;
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
-    // Видимая линия
+    // Видимая линия + клик
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', d);
     path.setAttribute('stroke', color);
@@ -182,17 +182,7 @@ function renderLinks() {
     path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
     path.setAttribute('opacity', '0.8');
     path.dataset.linkId = link.id;
-    svgLayer.appendChild(path);
-    // Невидимая широкая область клика (ПОСЛЕ круга — не блокирует)
-    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    hit.setAttribute('d', d);
-    hit.setAttribute('stroke', 'transparent');
-    hit.setAttribute('stroke-width', '20');
-    hit.setAttribute('fill', 'none');
-    hit.setAttribute('pointer-events', 'stroke');
-    hit.style.cursor = 'pointer';
-    hit.dataset.linkId = link.id;
-    hit.addEventListener('click', (e) => {
+    path.addEventListener('click', (e) => {
       e.stopPropagation();
       let px = e.clientX, py = e.clientY;
       const pw = 220, ph = 100;
@@ -203,18 +193,17 @@ function renderLinks() {
       linkPopup.classList.add('open');
       editingLink = link;
     });
-    svgLayer.appendChild(hit);
+    svgLayer.appendChild(path);
     // Красная кнопка ✕ в середине линии
     const midX = (src.x + tgt.x) / 2;
     const midY = (cp1y + cp2y) / 2;
     const delBtn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     delBtn.setAttribute('cx', midX);
     delBtn.setAttribute('cy', midY);
-    delBtn.setAttribute('r', '10');
+    delBtn.setAttribute('r', '12');
     delBtn.setAttribute('fill', '#e94560');
     delBtn.setAttribute('stroke', '#fff');
     delBtn.setAttribute('stroke-width', '2');
-    delBtn.setAttribute('cursor', 'pointer');
     delBtn.style.pointerEvents = 'all';
     delBtn.style.opacity = '0';
     delBtn.style.transition = 'opacity .2s';
@@ -235,7 +224,7 @@ function renderLinks() {
     delText.setAttribute('y', midY + 4);
     delText.setAttribute('text-anchor', 'middle');
     delText.setAttribute('fill', '#fff');
-    delText.setAttribute('font-size', '12');
+    delText.setAttribute('font-size', '14');
     delText.setAttribute('font-weight', 'bold');
     delText.setAttribute('pointer-events', 'none');
     delText.textContent = '✕';
