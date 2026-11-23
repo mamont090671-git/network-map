@@ -86,7 +86,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   const lighthouses = [];
 
   for (const n of nodes) {
-    const name = (n.label || 'unnamed').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const name = (n.label || 'unnamed').replace(/[^a-zA-Z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (!name) continue;
 
     const entry = {};
