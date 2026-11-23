@@ -90,8 +90,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (!name) continue;
 
     const entry = {};
-    const groups = (n.desc || '').split(',').map(s => s.trim()).filter(Boolean);
-    if (groups.length) entry.groups = groups;
+    if (n.groups && Array.isArray(n.groups) && n.groups.length) entry.groups = n.groups;
 
     const nebula_ip = {};
     if (n.ip_nebula) nebula_ip.ipv4 = n.ip_nebula + '/24';
