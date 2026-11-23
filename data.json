@@ -7,7 +7,7 @@
       "ip": "192.168.10.101",
       "desc": "Маяк",
       "x": 50,
-      "y": 30,
+      "y": 20,
       "color": "#4a90d9",
       "created_at": "2026-11-23T08:16:17.430Z",
       "ip_nebula": "192.168.10.101",
@@ -162,6 +162,15 @@
       "label": "",
       "details": "",
       "created_at": "2026-11-23T08:22:30.285Z"
+    },
+    {
+      "id": "7dcbc05a-4609-46b6-a5aa-c8a2b7158a3d",
+      "source": "31ac053a-a6de-451a-9fac-03a8dc6a139f",
+      "target": "cd943948-fa31-493a-953f-5d0d9426bbe3",
+      "type": "physical",
+      "label": "",
+      "details": "",
+      "created_at": "2026-11-23T08:55:49.277Z"
     }
   ]
 }

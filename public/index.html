@@ -183,6 +183,25 @@
     padding: 8px 16px; font-size: 12px; color: var(--text-dim); z-index: 50;
     white-space: nowrap;
   }
+  .link-type-picker {
+    position: absolute; background: var(--surface); border: 1px solid var(--accent);
+    border-radius: 10px; padding: 10px 14px; z-index: 400;
+    box-shadow: 0 8px 32px rgba(233,69,96,.3); display: none;
+  }
+  .link-type-picker.open { display: block; }
+  .link-type-picker .ltl { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; text-align: center; }
+  .link-type-picker .ltb { display: flex; gap: 6px; }
+  .link-type-picker .lt-btn {
+    width: 36px; height: 36px; border: 2px solid transparent; border-radius: 8px;
+    background: var(--bg); color: var(--text); cursor: pointer; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s, background .15s;
+  }
+  .link-type-picker .lt-btn:hover { background: var(--surface2); }
+  .link-type-picker .lt-btn.active { border-color: var(--accent); background: var(--surface2); }
+  .link-type-picker .lt-btn[data-type="physical"].active { border-color: #27ae60; }
+  .link-type-picker .lt-btn[data-type="wifi"].active { border-color: #2980b9; }
+  .link-type-picker .lt-btn[data-type="virtual"].active { border-color: #27ae60; }
 </style>
 </head>
 <body>
@@ -211,7 +230,7 @@
     <button onclick="zoomOut()">－</button>
     <button onclick="resetView()">⟲</button>
   </div>
-  <div id="help-tip">Колесо мыши — масштаб · Перетаскивание фона — пан · ПКМ на узле — меню · Тяни от точки-коннектора — новая связь</div>
+  <div id="help-tip">Колесо мыши — масштаб · Перетаскивание фона — пан · ПКМ на узле — меню · Тяни от точки-коннектора — новая связь · 📶 Выбор типа внизу</div>
 </div>
 <div class="modal-overlay" id="node-modal">
   <div class="modal">
@@ -292,6 +311,14 @@
   <button onclick="editNodeFromPopup()">✏️ Редактировать</button>
   <div class="separator"></div>
   <button class="del" onclick="deleteNodeFromPopup()">🗑 Удалить узел</button>
+</div>
+<div id="link-type-picker" class="link-type-picker">
+  <div class="ltl">Тип связи:</div>
+  <div class="ltb">
+    <button data-type="physical" class="lt-btn" title="Физическая">🔌</button>
+    <button data-type="wifi" class="lt-btn" title="WiFi">📶</button>
+    <button data-type="virtual" class="lt-btn" title="Виртуальная">🌐</button>
+  </div>
 </div>
 <script src="app.js"></script>
 </body>

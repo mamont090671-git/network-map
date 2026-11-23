@@ -8,6 +8,7 @@ let dragNode = null, dragOffX = 0, dragOffY = 0;
 let panStart = null, isPanning = false;
 let linkMode = false, linkSourceNode = null, linkSourceSide = null;
 let linkPreviewLine = null;
+let currentLinkType = 'physical';
 let selectedNodeId = null;
 let editingNode = null, editingLink = null, editingNodeFromPopup = null;
 let nodePopupNode = null;
@@ -16,8 +17,9 @@ const canvas = document.getElementById('canvas');
 const svgLayer = document.getElementById('svg-layer');
 const wrap = document.getElementById('canvas-wrap');
 const statusEl = document.getElementById('status-text');
-const linkPopup = document.getElementById('link-popup');
-const nodePopup = document.getElementById('node-popup');
+let linkPopup = document.getElementById('link-popup');
+let nodePopup = document.getElementById('node-popup');
+let linkTypePicker = document.getElementById('link-type-picker');
 const minimapCanvas = document.getElementById('minimap-canvas');
 const minimapCtx = minimapCanvas.getContext('2d');
 
@@ -146,9 +148,10 @@ function renderNodes() {
         if (targetId && targetId !== linkSourceNode) {
           links.push({
             id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
-            type: 'physical', label: '', details: '', created_at: new Date().toISOString(),
+            type: currentLinkType, label: '', details: '', created_at: new Date().toISOString(),
           });
           linkMode = false; linkSourceNode = null; linkSourceSide = null;
+          currentLinkType = 'physical';
           saveMap(); renderAll(); showStatus('Связь создана', true);
         }
       });
@@ -227,6 +230,7 @@ function clearLinkPreview() {
     });
   }
   linkMode = false; linkSourceNode = null; linkSourceSide = null;
+  hideLinkTypePicker();
 }
 
 // ═══════════════════════════════════════════
@@ -308,7 +312,7 @@ document.addEventListener('mouseup', (e) => {
       if (targetId && targetId !== linkSourceNode) {
         links.push({
           id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
-          type: 'physical', label: '', details: '', created_at: new Date().toISOString(),
+          type: currentLinkType, label: '', details: '', created_at: new Date().toISOString(),
         });
         saveMap(); renderAll(); showStatus('Связь создана', true);
       }
@@ -349,6 +353,16 @@ wrap.addEventListener('contextmenu', (e) => {
   }
 });
 document.addEventListener('click', () => { linkPopup.classList.remove('open'); nodePopup.classList.remove('open'); });
+
+// ═══════════════════════════════════════════
+//  LINK TYPE PICKER
+// ═══════════════════════════════════════════
+if (linkTypePicker) {
+  linkTypePicker.addEventListener('click', (e) => {
+    const btn = e.target.closest('.lt-btn');
+    if (btn) pickLinkType(btn.dataset.type);
+  });
+}
 
 // ═══════════════════════════════════════════
 //  NODE CRUD
@@ -441,7 +455,36 @@ function deleteNodeFromPopup() {
 // ═══════════════════════════════════════════
 function startLinkMode() {
   if (nodes.length < 2) { showStatus('Нужно минимум 2 узла', false); return; }
-  showStatus('Тяни от коннектора (🔴) к целевому узлу', false);
+  currentLinkType = 'physical';
+  updateLinkTypePicker();
+  showLinkTypePicker();
+  showStatus('Тяни от коннектора (🔴) к целевому узлу. Выбери тип связи внизу', false);
+}
+
+function showLinkTypePicker() {
+  if (!linkTypePicker) return;
+  linkTypePicker.style.left = '50%';
+  linkTypePicker.style.top = 'auto';
+  linkTypePicker.style.transform = 'translateX(-50%)';
+  linkTypePicker.style.bottom = '60px';
+  linkTypePicker.classList.add('open');
+  updateLinkTypePicker();
+}
+
+function hideLinkTypePicker() {
+  if (linkTypePicker) linkTypePicker.classList.remove('open');
+}
+
+function updateLinkTypePicker() {
+  if (!linkTypePicker) return;
+  linkTypePicker.querySelectorAll('.lt-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === currentLinkType);
+  });
+}
+
+function pickLinkType(type) {
+  currentLinkType = type;
+  updateLinkTypePicker();
 }
 
 function editLink() {
