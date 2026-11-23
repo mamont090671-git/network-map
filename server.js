@@ -202,7 +202,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   }
 
   // Save to file
-  const outputPath = join(__dirname, 'nebula-config.yaml');
+  const outputPath = join(__dirname, 'config-nebula.yaml');
   writeFileSync(outputPath, yaml, 'utf-8');
 
   return { ok: true, path: outputPath };

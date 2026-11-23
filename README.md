@@ -63,7 +63,7 @@ Lighthouse/Relay: чекбокс «Lighthouse / Relay» в модалке узл
 - `lighthouse` — секция с am_relay
 - `hosts` — все узлы (lighthouse не дублируется)
 - Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port
-- Файл сохраняется на сервере как `nebula-config.yaml`
+- Файл сохраняется на сервере как `config-nebula.yaml`
 
 ## Структура
 
@@ -75,7 +75,7 @@ network-map/
 │   └── app.js           # Canvas/SVG рендеринг, CRUD, навигация
 ├── data.json            # Карта (узлы + связи)
 ├── network-settings.json # Настройки сети (net-name, dev)
-├── nebula-config.yaml # Сгенерированный конфиг
+├── config-nebula.yaml # Сгенерированный конфиг
 ├── start.sh             # Запуск с проверками
 ├── .gitignore
 └── package.json
