@@ -167,7 +167,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
       if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
       if (h['nebula_ip']) {
         yaml += '    nebula_ip:\n';
-        yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
+        if (h['nebula_ip'].ipv4) yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
         if (h['nebula_ip'].ipv6) yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
       }
       if (h.port) yaml += '    port: ' + h.port + '\n';
