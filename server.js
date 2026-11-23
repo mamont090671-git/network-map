@@ -83,7 +83,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
 
   const nodes = mapData.nodes || [];
   const hosts = {};
-  let lighthouseName = null;
+  const lighthouses = [];
 
   for (const n of nodes) {
     const name = (n.label || 'unnamed').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -98,7 +98,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
 
     if (n.desc && n.desc.toLowerCase().includes('маяк')) {
-      lighthouseName = name;
+      lighthouses.push(name);
       entry.am_relay = true;
       entry.am_lh = true;
     }
@@ -106,33 +106,74 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     hosts[name] = entry;
   }
 
-  // Build YAML manually
-  let yaml = '# Auto-generated from network-map\n';
+  // Build YAML manually — correct nested format
+  let yaml = '';
+  yaml += '# Auto-generated from network-map\n';
   yaml += '# Generated: ' + new Date().toISOString() + '\n\n';
+  yaml += '# ============================================================\n';
+  yaml += '# Nebula VPN Config — exported from network-map\n';
+  yaml += '# ============================================================\n\n';
 
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += '# Общие настройки сети\n';
+  yaml += '# ----------------------------------------------------------\n\n';
   yaml += 'net-name: my-vpn-network\n';
   yaml += 'dev: nebula1\n\n';
 
-  yaml += 'lighthouse:\n';
-  for (const [name, host] of Object.entries(hosts)) {
-    if (host.am_lh) {
-      yaml += `  ${name}:\n`;
-      if (host.groups) yaml += `    groups: ${host.groups.join(',')}\n`;
-      if (host['nebula_ip']) yaml += `    nebula_ip: ${host['nebula_ip']}\n`;
-      if (host.port) yaml += `    port: ${host.port}\n`;
-      if (host.public_ip) yaml += `    public_ip: ${host.public_ip}\n`;
-      yaml += `    am_relay: true\n`;
-      yaml += `    am_lh: true\n`;
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += '# Relay-серверы\n';
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += 'relay_servers:\n';
+  for (const lh of lighthouses) {
+    const h = hosts[lh];
+    if (h && h['nebula_ip'] && h['nebula_ip'].ipv4) {
+      yaml += '  - ' + h['nebula_ip'].ipv4.split('/')[0] + '\n';
     }
   }
-  yaml += '\nhosts:\n';
-  for (const [name, host] of Object.entries(hosts)) {
-    yaml += `  # ${host.am_lh ? 'Lighthouse' : 'Host'}\n`;
-    yaml += `  ${name}:\n`;
-    if (host.groups) yaml += `    groups: ${host.groups.join(',')}\n`;
-    if (host['nebula_ip']) yaml += `    nebula_ip: ${host['nebula_ip']}\n`;
-    if (host.public_ip) yaml += `    public_ip: ${host.public_ip}\n`;
-    if (host.port !== undefined) yaml += `    port: ${host.port}\n`;
+  if (lighthouses.length === 0) yaml += '  # добавьте lighthouse IP выше\n';
+  yaml += '\n';
+
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += '# Маяки (Lighthouse)\n';
+  yaml += '# ----------------------------------------------------------\n';
+  if (lighthouses.length > 0) {
+    yaml += 'lighthouse:\n';
+    for (const name of lighthouses) {
+      const h = hosts[name];
+      yaml += '  ' + name + ':\n';
+      if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
+      if (h['nebula_ip']) {
+        yaml += '    nebula_ip:\n';
+        yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
+        if (h['nebula_ip'].ipv6) yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+      }
+      if (h.port) yaml += '    port: ' + h.port + '\n';
+      if (h.public_ip) yaml += '    public_ip: ' + h.public_ip + '\n';
+      yaml += '    am_relay: true\n';
+      yaml += '    am_lh: true\n';
+      yaml += '\n';
+    }
+  } else {
+    yaml += 'lighthouse:\n';
+    yaml += '  # Добавьте маяки из узлов карты\n';
+    yaml += '\n';
+  }
+
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += '# Хосты (Hosts)\n';
+  yaml += '# ----------------------------------------------------------\n';
+  yaml += 'hosts:\n';
+  for (const [name, h] of Object.entries(hosts)) {
+    yaml += '  # ' + (h.am_lh ? 'Lighthouse' : 'Host') + '\n';
+    yaml += '  ' + name + ':\n';
+    if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
+    if (h['nebula_ip']) {
+      yaml += '    nebula_ip:\n';
+      yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
+      if (h['nebula_ip'].ipv6) yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+    }
+    if (h.public_ip) yaml += '    public_ip: ' + h.public_ip + '\n';
+    if (h.port !== undefined) yaml += '    port: ' + h.port + '\n';
     yaml += '\n';
   }
 
