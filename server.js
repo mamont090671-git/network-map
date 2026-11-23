@@ -99,6 +99,10 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.ip_public) entry.public_ip = n.ip_public;
     if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
 
+    // Только компьютеры, сервера, телефоны и хранилища
+    const allowedTypes = ['server', 'pc', 'phone', 'storage'];
+    if (!allowedTypes.includes(n.type)) continue;
+
     if (n.desc && n.desc.toLowerCase().includes('маяк')) {
       lighthouses.push(name);
       entry.am_relay = true;
