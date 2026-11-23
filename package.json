@@ -1,0 +1,14 @@
+{
+  "name": "network-map",
+  "version": "1.0.0",
+  "description": "Local network map with physical and virtual connections",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.28.0",
+    "fastify-plugin": "^4.5.1",
+    "fastify-static": "^4.3.0"
+  }
+}

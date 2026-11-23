@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карта локальной сети</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface2: #0f3460;
+    --accent: #e94560;
+    --accent2: #533483;
+    --text: #eee;
+    --text-dim: #aaa;
+    --node-w: 180px;
+    --node-h: 90px;
+    --grid: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  #toolbar {
+    display: flex; gap: 8px; padding: 10px 16px;
+    background: var(--surface); border-bottom: 1px solid #333;
+    z-index: 100; flex-wrap: wrap; align-items: center;
+  }
+  #toolbar button, #toolbar select {
+    padding: 6px 14px; border: 1px solid #444; border-radius: 6px;
+    background: var(--surface2); color: var(--text); cursor: pointer;
+    font-size: 13px; transition: background .15s;
+  }
+  #toolbar button:hover { background: var(--accent); border-color: var(--accent); }
+  #toolbar button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  #toolbar button.primary:hover { background: #c0392b; }
+  #toolbar .sep { width: 1px; height: 28px; background: #444; }
+  #toolbar .status { margin-left: auto; font-size: 12px; color: var(--text-dim); }
+  #toolbar .status.saved { color: #2ecc71; }
+  #canvas-wrap {
+    flex: 1; position: relative; overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, #222 0%, var(--bg) 100%);
+  }
+  #canvas-wrap::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: var(--grid) var(--grid);
+    pointer-events: none; z-index: 0;
+  }
+  #canvas { width: 100%; height: 100%; position: relative; z-index: 1; }
+  #svg-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
+  #svg-layer path { pointer-events: stroke; cursor: pointer; }
+  #svg-layer path:hover { stroke-width: 4; filter: brightness(1.3); }
+  .node-card {
+    position: absolute; width: var(--node-w); height: var(--node-h);
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: 12px; cursor: grab; user-select: none;
+    display: flex; flex-direction: column; z-index: 10;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .node-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(233,69,96,.2); }
+  .node-card.dragging { cursor: grabbing; z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,.5); opacity: .92; }
+  .node-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(233,69,96,.35); }
+  .node-header {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px 2px;
+    font-weight: 600; font-size: 14px; pointer-events: none;
+  }
+  .node-header .icon { font-size: 18px; }
+  .node-body {
+    flex: 1; display: flex; align-items: center; gap: 6px;
+    padding: 0 10px; font-size: 12px; color: var(--text-dim); pointer-events: none;
+  }
+  .node-actions {
+    position: absolute; top: -8px; right: -8px; display: none; gap: 2px;
+  }
+  .node-card:hover .node-actions { display: flex; }
+  .node-actions button {
+    width: 22px; height: 22px; border: none; border-radius: 50%;
+    cursor: pointer; font-size: 12px; display: flex; align-items: center;
+    justify-content: center; background: var(--surface2); color: var(--text);
+    transition: background .15s;
+  }
+  .node-actions button.del:hover { background: var(--accent); }
+  .node-actions button.edit:hover { background: var(--accent2); }
+  .conn-dot {
+    position: absolute; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--surface);
+    cursor: crosshair; z-index: 20; opacity: 0; transition: opacity .15s, transform .15s;
+  }
+  .node-card:hover .conn-dot { opacity: 1; }
+  .conn-dot:hover { transform: scale(1.5); }
+  .conn-dot.top    { top: -6px; left: calc(50% - 6px); }
+  .conn-dot.bottom { bottom: -6px; left: calc(50% - 6px); }
+  .conn-dot.left   { left: -6px; top: calc(50% - 6px); }
+  .conn-dot.right  { right: -6px; top: calc(50% - 6px); }
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid #444; border-radius: 12px;
+    padding: 24px; min-width: 360px; max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .modal h3 { margin-bottom: 16px; font-size: 18px; }
+  .modal .field { margin-bottom: 12px; }
+  .modal .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+  .modal .field input, .modal .field select, .modal .field textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid #555; border-radius: 6px;
+    background: var(--bg); color: var(--text); font-size: 14px; outline: none;
+    transition: border-color .15s;
+  }
+  .modal .field input:focus, .modal .field select:focus { border-color: var(--accent); }
+  .modal .row { display: flex; gap: 10px; }
+  .modal .row .field { flex: 1; }
+  .modal .btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+  .modal .btns button {
+    padding: 8px 20px; border: 1px solid #555; border-radius: 6px;
+    cursor: pointer; font-size: 14px; background: var(--surface2); color: var(--text);
+    transition: background .15s;
+  }
+  .modal .btns button:hover { background: #555; }
+  .modal .btns button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .modal .btns button.primary:hover { background: #c0392b; }
+  .link-popup {
+    position: absolute; background: var(--surface); border: 1px solid #555;
+    border-radius: 8px; padding: 10px; z-index: 300; display: none;
+    min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .link-popup.open { display: block; }
+  .link-popup button {
+    display: block; width: 100%; padding: 6px 10px; border: none;
+    background: transparent; color: var(--text); cursor: pointer;
+    text-align: left; font-size: 13px; border-radius: 4px;
+  }
+  .link-popup button:hover { background: var(--surface2); }
+  .link-popup button.del:hover { color: var(--accent); }
+  .node-popup {
+    position: absolute; background: var(--surface); border: 1px solid #555;
+    border-radius: 8px; padding: 10px; z-index: 300; display: none;
+    min-width: 180px; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .node-popup.open { display: block; }
+  .node-popup button {
+    display: block; width: 100%; padding: 8px 10px; border: none;
+    background: transparent; color: var(--text); cursor: pointer;
+    text-align: left; font-size: 13px; border-radius: 4px;
+  }
+  .node-popup button:hover { background: var(--surface2); }
+  .node-popup button.del:hover { color: var(--accent); }
+  .node-popup .separator { height: 1px; background: #444; margin: 4px 0; }
+  #minimap {
+    position: absolute; bottom: 12px; right: 12px; width: 180px; height: 120px;
+    background: rgba(22,33,62,.9); border: 1px solid #444; border-radius: 8px;
+    overflow: hidden; z-index: 50;
+  }
+  #minimap canvas { width: 100%; height: 100%; }
+  #zoom-controls {
+    position: absolute; bottom: 12px; left: 12px; display: flex;
+    flex-direction: column; gap: 4px; z-index: 50;
+  }
+  #zoom-controls button {
+    width: 36px; height: 36px; border: 1px solid #444; border-radius: 8px;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+  }
+  #zoom-controls button:hover { background: var(--surface2); }
+  #help-tip {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(22,33,62,.95); border: 1px solid #444; border-radius: 8px;
+    padding: 8px 16px; font-size: 12px; color: var(--text-dim); z-index: 50;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <button class="primary" onclick="openAddNode()">＋ Узел</button>
+  <button onclick="startLinkMode()">🔗 Связь</button>
+  <div class="sep"></div>
+  <button onclick="zoomIn()">＋</button>
+  <button onclick="zoomOut()">－</button>
+  <button onclick="resetView()">⟲ Сброс</button>
+  <div class="sep"></div>
+  <button onclick="exportMap()">📥 Экспорт</button>
+  <button onclick="document.getElementById('import-input').click()">📤 Импорт</button>
+  <input type="file" id="import-input" accept=".json" style="display:none" onchange="importMap(event)">
+  <div class="sep"></div>
+  <button onclick="shutdownServer()" style="background:#c0392b;border-color:#c0392b;color:#fff;">⏹ Стоп</button>
+  <span class="status" id="status-text"></span>
+</div>
+<div id="canvas-wrap">
+  <div id="canvas">
+    <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div id="minimap"><canvas id="minimap-canvas"></canvas></div>
+  <div id="zoom-controls">
+    <button onclick="zoomIn()">＋</button>
+    <button onclick="zoomOut()">－</button>
+    <button onclick="resetView()">⟲</button>
+  </div>
+  <div id="help-tip">Колесо мыши — масштаб · Перетаскивание фона — пан · ПКМ на узле — меню · Тяни от точки-коннектора — новая связь</div>
+</div>
+<div class="modal-overlay" id="node-modal">
+  <div class="modal">
+    <h3 id="node-modal-title">Новый узел</h3>
+    <div class="field">
+      <label>Название</label>
+      <input id="nm-label" placeholder="Название узла">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Тип</label>
+        <select id="nm-type">
+          <option value="server">🖥 Сервер</option>
+          <option value="switch">🔀 Свитч</option>
+          <option value="router">🌐 Роутер</option>
+          <option value="firewall">🛡 Фаервол</option>
+          <option value="pc">💻 Компьютер</option>
+          <option value="printer">🖨 Принтер</option>
+          <option value="storage">💾 Хранилище</option>
+          <option value="phone">📱 Телефон</option>
+          <option value="ap">📡 Точка доступа</option>
+          <option value="other">⚙️ Другое</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>IP-адрес</label>
+        <input id="nm-ip" placeholder="192.168.1.1">
+      </div>
+    </div>
+    <div class="field">
+      <label>Описание</label>
+      <textarea id="nm-desc" rows="2" placeholder="Описание узла"></textarea>
+    </div>
+    <div class="btns">
+      <button onclick="closeNodeModal()">Отмена</button>
+      <button class="primary" onclick="saveNodeModal()">Сохранить</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="link-modal">
+  <div class="modal">
+    <h3 id="link-modal-title">Связь</h3>
+    <div class="field">
+      <label>Тип связи</label>
+      <select id="lm-type">
+        <option value="physical">Физическая (Ethernet / оптика)</option>
+        <option value="virtual">Виртуальная (VLAN / VPN)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Метка</label>
+      <input id="lm-label" placeholder="Метка связи">
+    </div>
+    <div class="field">
+      <label>Детали</label>
+      <textarea id="lm-details" rows="2" placeholder="VLAN ID, имя VPN и т.д."></textarea>
+    </div>
+    <div class="btns">
+      <button onclick="closeLinkModal()">Отмена</button>
+      <button class="primary" onclick="saveLinkModal()">Сохранить</button>
+    </div>
+  </div>
+</div>
+<div class="link-popup" id="link-popup">
+  <button onclick="editLink()">✏️ Редактировать</button>
+  <button class="del" onclick="deleteLink()">🗑 Удалить</button>
+</div>
+<div class="node-popup" id="node-popup">
+  <button onclick="editNodeFromPopup()">✏️ Редактировать</button>
+  <div class="separator"></div>
+  <button class="del" onclick="deleteNodeFromPopup()">🗑 Удалить узел</button>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
