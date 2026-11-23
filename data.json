@@ -28,7 +28,8 @@
       "ip_nebula": "192.168.10.111",
       "ip_public": "",
       "ip_local": "192.168.8.100",
-      "port_nebula": "0"
+      "port_nebula": "0",
+      "ipv6_nebula": "fd00:1234:5678:a:111"
     },
     {
       "id": "8198d8a6-17ff-4887-aa2f-370d6da218af",

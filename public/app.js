@@ -121,7 +121,10 @@ function renderNodes() {
     const icon = ICONS[n.type] || ICONS.other;
     el.innerHTML = `
       <div class="node-header"><span class="icon">${icon}</span><span>${esc(n.label)}</span></div>
-      <div class="node-body"><span>${n.ip_public || '—'}</span><span>${n.ip_nebula || '—'}:${n.port_nebula || ''}</span><span>${n.ipv6_nebula || '—'}</span><span>${n.ip_local || '—'}</span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">v4</span><span>${n.ip_nebula || '—'}</span>${n.port_nebula ? '<span class="ip-port">:' + n.port_nebula + '</span>' : ''}</span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">v6</span><span>${n.ipv6_nebula || '—'}</span></span></span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">pub</span><span>${n.ip_public || '—'}</span></span></span></div>
+      <div class="node-body"><span class="ip-col"><span class="ip-label">loc</span><span>${n.ip_local || '—'}</span></span></span></div>
       <div class="node-actions">
         <button class="edit" onclick="event.stopPropagation(); openEditNode('${n.id}')" title="Редактировать">✏</button>
         <button class="del" onclick="event.stopPropagation(); deleteNode('${n.id}')" title="Удалить">✕</button>
