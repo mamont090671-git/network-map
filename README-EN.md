@@ -34,7 +34,7 @@ Each node contains:
 | Groups | Access groups comma-separated (home,ssh) |
 | Description | Free-text description |
 
-Lighthouse auto-detection: if description contains "маяк" (lighthouse) — node marked as `am_relay: true, `.
+Lighthouse / Relay: checkbox "Lighthouse / Relay" in node modal → `am_relay: true`.
 
 ### Links
 
