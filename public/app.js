@@ -352,7 +352,11 @@ wrap.addEventListener('contextmenu', (e) => {
     renderAll();
   }
 });
-document.addEventListener('click', () => { linkPopup.classList.remove('open'); nodePopup.classList.remove('open'); });
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.link-popup') || e.target.closest('.node-popup') || e.target.closest('.link-type-picker')) return;
+  linkPopup.classList.remove('open');
+  nodePopup.classList.remove('open');
+});
 
 // ═══════════════════════════════════════════
 //  LINK TYPE PICKER
