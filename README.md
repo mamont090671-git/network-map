@@ -63,7 +63,7 @@ cd network-map
 - `lighthouse` — секция с am_relay
 - `hosts` — все узлы (lighthouse не дублируется)
 - Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port
-- Файл сохраняется на сервере как `nebula-config-export.yaml` и скачивается
+- Файл сохраняется на сервере как `nebula-config.yaml` и скачивается
 
 ## Структура
 
@@ -75,7 +75,7 @@ network-map/
 │   └── app.js           # Canvas/SVG рендеринг, CRUD, навигация
 ├── data.json            # Карта (узлы + связи)
 ├── network-settings.json # Настройки сети (net-name, dev)
-├── nebula-config-export.yaml # Сгенерированный конфиг
+├── nebula-config.yaml # Сгенерированный конфиг
 ├── start.sh             # Запуск с проверками
 ├── .gitignore
 └── package.json

@@ -63,7 +63,7 @@ Deletion: click red ✕ on link.
 - `lighthouse` — section with am_relay
 - `hosts` — all nodes (lighthouse not duplicated)
 - Each host: groups, nebula_ip (ipv4/ipv6), public_ip, port
-- File saved on server as `nebula-config-export.yaml` and downloaded
+- File saved on server as `nebula-config.yaml` and downloaded
 
 ## Structure
 
@@ -75,7 +75,7 @@ network-map/
 │   └── app.js           # Canvas/SVG rendering, CRUD, navigation
 ├── data.json            # Map (nodes + links)
 ├── network-settings.json # Network settings (net-name, dev)
-├── nebula-config-export.yaml # Generated config
+├── nebula-config.yaml # Generated config
 ├── start.sh             # Launch with checks
 ├── .gitignore
 └── package.json
