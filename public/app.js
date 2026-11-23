@@ -677,8 +677,16 @@ async function exportNebulaConfig() {
 let netSettings = { 'net-name': 'my-vpn-network', dev: 'nebula1' };
 
 function openNetSettings() {
-  document.getElementById('ns-net-name').value = netSettings['net-name'] || '';
-  document.getElementById('ns-dev').value = netSettings.dev || '';
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(s => {
+      document.getElementById('ns-net-name').value = s['net-name'] || '';
+      document.getElementById('ns-dev').value = s.dev || '';
+    })
+    .catch(() => {
+      document.getElementById('ns-net-name').value = netSettings['net-name'] || '';
+      document.getElementById('ns-dev').value = netSettings.dev || '';
+    });
   document.getElementById('net-settings-modal').classList.add('open');
 }
 

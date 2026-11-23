@@ -220,6 +220,23 @@ fastify.post('/api/settings', async (request, reply) => {
   }
 });
 
+// GET /api/settings — load network settings
+fastify.get('/api/settings', async () => {
+  const settingsFile = join(__dirname, 'network-settings.json');
+  if (!existsSync(settingsFile)) {
+    return { 'net-name': 'my-vpn-network', dev: 'nebula1' };
+  }
+  try {
+    const s = JSON.parse(readFileSync(settingsFile, 'utf-8'));
+    return {
+      'net-name': s['net-name'] || 'my-vpn-network',
+      dev: s.dev || 'nebula1',
+    };
+  } catch {
+    return { 'net-name': 'my-vpn-network', dev: 'nebula1' };
+  }
+});
+
 // Serve static files manually
 fastify.get('/*', async (request, reply) => {
   let filePath = request.url;
