@@ -160,21 +160,38 @@ function renderLinks() {
     const cp1x = src.x + dx * 0.4, cp1y = src.y;
     const cp2x = tgt.x - dx * 0.4, cp2y = tgt.y;
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
-    // Видимая линия + клик
+
+    // 1. Группа для всей связи
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'link-group');
+    group.dataset.linkId = link.id;
+
+    // 2. Невидимая широкая зона для удобного наведения
+    const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hitPath.setAttribute('d', d);
+    hitPath.setAttribute('stroke', 'transparent');
+    hitPath.setAttribute('stroke-width', '16');
+    hitPath.setAttribute('fill', 'none');
+    hitPath.setAttribute('pointer-events', 'stroke');
+    hitPath.style.cursor = 'pointer';
+
+    // 3. Видимая линия связи
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('class', 'link-path');
     path.setAttribute('d', d);
     path.setAttribute('stroke', color);
     path.setAttribute('stroke-width', '3');
     path.setAttribute('fill', 'none');
     path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
     path.setAttribute('opacity', '0.8');
-    path.setAttribute('pointer-events', 'stroke');
-    path.style.cursor = 'pointer';
-    path.dataset.linkId = link.id;
-    // Блокируем всплытие mousedown, чтобы не начать пан/драг при клике на связь
-    path.addEventListener('mousedown', e => { e.stopPropagation(); });
-    // Клик — контекстное меню
-    path.addEventListener('click', (e) => {
+    path.setAttribute('pointer-events', 'none');
+
+    group.appendChild(hitPath);
+    group.appendChild(path);
+
+    // Обработчики кликов на широкой зоне hitPath
+    hitPath.addEventListener('mousedown', e => { e.stopPropagation(); });
+    hitPath.addEventListener('click', (e) => {
       e.stopPropagation();
       let px = e.clientX, py = e.clientY;
       const pw = 220, ph = 100;
@@ -185,15 +202,19 @@ function renderLinks() {
       linkPopup.classList.add('open');
       editingLink = link;
     });
-    // Дабл-клик — сразу редактировать
-    path.addEventListener('dblclick', (e) => {
+    hitPath.addEventListener('dblclick', (e) => {
       e.stopPropagation();
       editLink();
     });
-    svgLayer.appendChild(path);
-    // Красная кнопка ✕ в середине линии
+
+    // 4. Кнопка удаления в своей группе
     const midX = (src.x + tgt.x) / 2;
     const midY = (cp1y + cp2y) / 2;
+
+    const delGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    delGroup.setAttribute('class', 'link-del-btn');
+    delGroup.style.cursor = 'pointer';
+
     const delBtn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     delBtn.setAttribute('cx', midX);
     delBtn.setAttribute('cy', midY);
@@ -201,19 +222,8 @@ function renderLinks() {
     delBtn.setAttribute('fill', '#e94560');
     delBtn.setAttribute('stroke', '#fff');
     delBtn.setAttribute('stroke-width', '2');
-    delBtn.style.pointerEvents = 'all';
-    delBtn.style.cursor = 'pointer';
-    delBtn.style.opacity = '1';
-    delBtn.dataset.linkId = link.id;
-    delBtn.addEventListener('mousedown', e => { e.stopPropagation(); });
-    delBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      console.log('CIRCLE CLICK FIRED!', link.id, midX, midY);
-      links = links.filter(l => l.id !== link.id);
-      saveMap(); renderAll(); showStatus('Связь удалена', true);
-    }, false);
-    svgLayer.appendChild(delBtn);
-    // Кнопка ✕ (текст)
+    delBtn.setAttribute('pointer-events', 'all');
+
     const delText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     delText.setAttribute('x', midX);
     delText.setAttribute('y', midY + 4);
@@ -223,10 +233,23 @@ function renderLinks() {
     delText.setAttribute('font-weight', 'bold');
     delText.setAttribute('pointer-events', 'none');
     delText.textContent = '✕';
-    delText.style.opacity = '1';
-    delText.dataset.linkId = link.id;
-    svgLayer.appendChild(delText);
+
+    delGroup.addEventListener('mousedown', e => { e.stopPropagation(); });
+    delGroup.addEventListener('click', (e) => {
+      e.stopPropagation();
+      links = links.filter(l => l.id !== link.id);
+      saveMap();
+      renderAll();
+      showStatus('Связь удалена', true);
+    });
+
+    delGroup.appendChild(delBtn);
+    delGroup.appendChild(delText);
+    group.appendChild(delGroup);
+
+    svgLayer.appendChild(group);
   });
+
   let defs = svgLayer.querySelector('defs');
   if (!defs) {
     defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -382,7 +405,6 @@ wrap.addEventListener('contextmenu', (e) => {
   if (nodeEl) {
     selectedNodeId = nodeEl.dataset.id;
     nodePopupNode = nodes.find(n => n.id === selectedNodeId);
-    // Position popup near click
     nodePopup.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
     nodePopup.style.top = Math.min(e.clientY, window.innerHeight - 150) + 'px';
     nodePopup.classList.add('open');

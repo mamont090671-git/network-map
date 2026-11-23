@@ -208,6 +208,24 @@
   .link-type-picker .lt-btn[data-type="physical"].active { border-color: #27ae60; }
   .link-type-picker .lt-btn[data-type="wifi"].active { border-color: #2980b9; }
   .link-type-picker .lt-btn[data-type="virtual"].active { border-color: #8e44ad; }
+
+  /* ===== Связи: группа с hover ===== */
+  .link-group { cursor: pointer; }
+  .link-group .link-path {
+    opacity: 0.8;
+    transition: stroke-width .15s, opacity .15s;
+  }
+  .link-group:hover .link-path {
+    stroke-width: 4.5;
+    opacity: 1;
+  }
+  .link-group .link-del-btn {
+    opacity: 0;
+    transition: opacity .15s ease;
+  }
+  .link-group:hover .link-del-btn {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
