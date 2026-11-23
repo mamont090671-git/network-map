@@ -90,7 +90,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     const allowedTypes = ['server', 'pc', 'phone', 'storage'];
     if (!allowedTypes.includes(n.type)) continue;
 
-    const name = (n.label || 'unnamed').replace(/[^a-zA-Z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    let name = (n.label || 'unnamed').replace(/[^a-zA-Z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (!name) continue;
 
     const entry = {};
