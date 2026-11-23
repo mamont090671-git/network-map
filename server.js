@@ -195,9 +195,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   const outputPath = join(__dirname, 'nebula-config.yaml');
   writeFileSync(outputPath, yaml, 'utf-8');
 
-  reply.header('Content-Disposition', 'attachment; filename="nebula-config.yaml"');
-  reply.type('text/yaml; charset=utf-8');
-  return yaml;
+  return { ok: true, path: outputPath };
 });
 
 // POST /api/settings — save network settings
