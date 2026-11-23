@@ -32,7 +32,7 @@ const NODE_COLORS = {
   storage: '#2c3e50', phone: '#f39c12', ap: '#3498db',
   other: '#95a5a6',
 };
-const LINK_COLORS = { physical: '#27ae60', virtual: '#9b59b6' };
+const LINK_COLORS = { physical: '#27ae60', wifi: '#2980b9', virtual: '#27ae60' };
 
 // ═══════════════════════════════════════════
 //  UTILS
@@ -162,7 +162,9 @@ function renderLinks() {
   links.forEach(link => {
     const src = getConnPoint(link.source, 'right');
     const tgt = getConnPoint(link.target, 'left');
+    const isWifi = link.type === 'wifi';
     const isVirtual = link.type === 'virtual';
+    const isDashed = isWifi || isVirtual;
     const color = LINK_COLORS[link.type] || '#27ae60';
     const dx = Math.abs(tgt.x - src.x);
     const cp1x = src.x + dx * 0.4, cp1y = src.y;
@@ -171,10 +173,10 @@ function renderLinks() {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', d);
     path.setAttribute('stroke', color);
-    path.setAttribute('stroke-width', isVirtual ? '2.5' : '3');
+    path.setAttribute('stroke-width', '3');
     path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-dasharray', isVirtual ? '8,6' : 'none');
-    path.setAttribute('opacity', '0.7');
+    path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
+    path.setAttribute('opacity', '0.8');
     path.dataset.linkId = link.id;
     path.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -194,8 +196,8 @@ function renderLinks() {
     <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
       <path d="M0,0 L8,3 L0,6 Z" fill="#27ae60" opacity="0.8"/>
     </marker>
-    <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#9b59b6" opacity="0.8"/>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#2980b9" opacity="0.8"/>
     </marker>`;
 }
 
