@@ -106,6 +106,7 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.is_lh) {
       lighthouses.push(name);
       entry.am_relay = true;
+      entry.am_lh = true;
     }
 
     hosts[name] = entry;
