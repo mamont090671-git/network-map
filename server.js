@@ -86,6 +86,10 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   const lighthouses = [];
 
   for (const n of nodes) {
+    // Только компьютеры, сервера, телефоны и хранилища
+    const allowedTypes = ['server', 'pc', 'phone', 'storage'];
+    if (!allowedTypes.includes(n.type)) continue;
+
     const name = (n.label || 'unnamed').replace(/[^a-zA-Z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (!name) continue;
 
@@ -98,10 +102,6 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (Object.keys(nebula_ip).length) entry['nebula_ip'] = nebula_ip;
     if (n.ip_public) entry.public_ip = n.ip_public;
     if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
-
-    // Только компьютеры, сервера, телефоны и хранилища
-    const allowedTypes = ['server', 'pc', 'phone', 'storage'];
-    if (!allowedTypes.includes(n.type)) continue;
 
     if (n.desc && n.desc.toLowerCase().includes('маяк')) {
       lighthouses.push(name);
