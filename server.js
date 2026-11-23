@@ -268,6 +268,7 @@ fastify.get('/*', async (request, reply) => {
 
   reply.header('Cache-Control', 'no-cache');
   if (ext === '.js' || ext === '.html') reply.header('Cache-Control', 'no-cache');
+  reply.type(MIME[ext] || 'application/octet-stream');
   return reply.send(createReadStream(fullPath));
 });
 
