@@ -63,7 +63,7 @@ cd network-map
 - `lighthouse` — секция с am_relay
 - `hosts` — все узлы (lighthouse не дублируется)
 - Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port
-- Файл сохраняется на сервере как `nebula-config.yaml` и скачивается
+- Файл сохраняется на сервере как `nebula-config.yaml`
 
 ## Структура
 
