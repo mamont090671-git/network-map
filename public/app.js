@@ -170,9 +170,9 @@ function renderLinks() {
       // Горизонтальная: отклонение по Y
       const offset = Math.max(40, absDy * 0.3);
       cp1x = src.x + dx * 0.4;
-      cp1y = src.y + (link.sourceSide === 'top' ? offset : -offset);
+      cp1y = src.y + (link.sourceSide === 'top' ? -offset : (link.sourceSide === 'bottom' ? offset : 0));
       cp2x = tgt.x - dx * 0.4;
-      cp2y = tgt.y + (link.targetSide === 'top' ? -offset : offset);
+      cp2y = tgt.y + (link.targetSide === 'top' ? -offset : (link.targetSide === 'bottom' ? offset : 0));
     } else {
       // Вертикальная: отклонение по X
       const offset = Math.max(40, absDx * 0.3);
