@@ -40,7 +40,7 @@ Lighthouse auto-detection: if description contains "маяк" (lighthouse) — n
 
 - **Physical** — solid green line (Ethernet, fiber)
 - **WiFi** — blue dashed
-- **Virtual** — green dashed (VLAN, VPN)
+- **Virtual** — purple dashed (VLAN, VPN)
 
 Creation: drag from connector (🔴) to target node.
 Deletion: click red ✕ on link.
