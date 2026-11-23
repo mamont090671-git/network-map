@@ -249,6 +249,7 @@
   <button onclick="resetView()">⟲ Сброс</button>
   <div class="sep"></div>
   <button onclick="exportMap()">📥 Экспорт</button>
+  <button onclick="openNetSettings()">⚙️ Настройки</button>
   <button onclick="exportNebulaConfig()">🌐 Nebula</button>
   <button onclick="document.getElementById('import-input').click()">📤 Импорт</button>
   <input type="file" id="import-input" accept=".json" style="display:none" onchange="importMap(event)">
@@ -366,6 +367,25 @@
     <button data-type="physical" class="lt-btn" title="Физическая">🔌</button>
     <button data-type="wifi" class="lt-btn" title="WiFi">📶</button>
     <button data-type="virtual" class="lt-btn" title="Виртуальная">🌐</button>
+  </div>
+</div>
+
+<!-- Настройки сети -->
+<div class="modal-overlay" id="net-settings-modal">
+  <div class="modal">
+    <h3>Настройки сети</h3>
+    <div class="field">
+      <label>Net Name</label>
+      <input id="ns-net-name" placeholder="my-vpn-network">
+    </div>
+    <div class="field">
+      <label>Dev</label>
+      <input id="ns-dev" placeholder="nebula1">
+    </div>
+    <div class="btns">
+      <button onclick="closeNetSettings()">Отмена</button>
+      <button class="primary" onclick="saveNetSettings()">Сохранить</button>
+    </div>
   </div>
 </div>
 <script src="app.js"></script>

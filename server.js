@@ -119,8 +119,19 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   yaml += '# ----------------------------------------------------------\n';
   yaml += '# Общие настройки сети\n';
   yaml += '# ----------------------------------------------------------\n\n';
-  yaml += 'net-name: my-vpn-network\n';
-  yaml += 'dev: nebula1\n\n';
+  // Read network settings
+  const settingsFile = join(__dirname, 'network-settings.json');
+  let netName = 'my-vpn-network';
+  let dev = 'nebula1';
+  if (existsSync(settingsFile)) {
+    try {
+      const s = JSON.parse(readFileSync(settingsFile, 'utf-8'));
+      netName = s['net-name'] || netName;
+      dev = s.dev || dev;
+    } catch {}
+  }
+  yaml += 'net-name: ' + netName + '\n';
+  yaml += 'dev: ' + dev + '\n\n';
 
   yaml += '# ----------------------------------------------------------\n';
   yaml += '# Relay-серверы\n';
@@ -187,6 +198,26 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   reply.header('Content-Disposition', 'attachment; filename="nebula-config-export.yaml"');
   reply.type('text/yaml; charset=utf-8');
   return yaml;
+});
+
+// POST /api/settings — save network settings
+fastify.post('/api/settings', async (request, reply) => {
+  const body = request.body;
+  if (!body || typeof body !== 'object') {
+    reply.code(400);
+    return { error: 'Invalid body' };
+  }
+  const settingsFile = join(__dirname, 'network-settings.json');
+  try {
+    writeFileSync(settingsFile, JSON.stringify({
+      'net-name': body['net-name'] || 'my-vpn-network',
+      dev: body.dev || 'nebula1',
+    }, null, 2), 'utf-8');
+    return { ok: true };
+  } catch (err) {
+    reply.code(500);
+    return { error: err.message };
+  }
 });
 
 // Serve static files manually

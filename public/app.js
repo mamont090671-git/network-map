@@ -672,6 +672,33 @@ async function exportNebulaConfig() {
 }
 
 // ═══════════════════════════════════════════
+//  NETWORK SETTINGS
+// ═══════════════════════════════════════════
+let netSettings = { 'net-name': 'my-vpn-network', dev: 'nebula1' };
+
+function openNetSettings() {
+  document.getElementById('ns-net-name').value = netSettings['net-name'] || '';
+  document.getElementById('ns-dev').value = netSettings.dev || '';
+  document.getElementById('net-settings-modal').classList.add('open');
+}
+
+function closeNetSettings() {
+  document.getElementById('net-settings-modal').classList.remove('open');
+}
+
+function saveNetSettings() {
+  netSettings['net-name'] = document.getElementById('ns-net-name').value.trim() || 'my-vpn-network';
+  netSettings.dev = document.getElementById('ns-dev').value.trim() || 'nebula1';
+  fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(netSettings),
+  }).catch(() => {});
+  closeNetSettings();
+  showStatus('Настройки сети сохранены', true);
+}
+
+// ═══════════════════════════════════════════
 //  KEYBOARD
 // ═══════════════════════════════════════════
 document.addEventListener('keydown', (e) => {
