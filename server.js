@@ -83,6 +83,10 @@ fastify.get('/*', async (request, reply) => {
   }
 
   reply.type(MIME[ext] || 'application/octet-stream');
+  // Cache-bust JS
+  if (ext === '.js') reply.header('Cache-Control', 'no-cache');
+  if (ext === '.html') reply.header('Cache-Control', 'no-cache');
+  reply.type(MIME[ext] || 'application/octet-stream');
   return reply.send(createReadStream(fullPath));
 });
 

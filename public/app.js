@@ -207,13 +207,12 @@ function renderLinks() {
     delBtn.style.pointerEvents = 'all';
     delBtn.style.opacity = '1';
     delBtn.dataset.linkId = link.id;
-    delBtn.addEventListener('click', (e) => {
+    delBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      if (confirm(`Удалить связь?`)) {
-        links = links.filter(l => l.id !== link.id);
-        saveMap(); renderAll(); showStatus('Связь удалена', true);
-      }
-    });
+      console.log('CIRCLE CLICK FIRED!', link.id, midX, midY);
+      links = links.filter(l => l.id !== link.id);
+      saveMap(); renderAll(); showStatus('Связь удалена', true);
+    }, false);
     svgLayer.appendChild(delBtn);
     // Кнопка ✕ (текст)
     const delText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
