@@ -109,6 +109,12 @@ fastify.get('/api/export/nebula', async (request, reply) => {
       entry.am_lh = true;
     }
 
+    if (hosts[name]) {
+      let suff = 2;
+      let newName = name + '-' + suff;
+      while (hosts[newName]) { suff++; newName = name + '-' + suff; }
+      name = newName;
+    }
     hosts[name] = entry;
   }
 
