@@ -51,8 +51,8 @@ function getConnPoint(nodeId, side) {
   const n = nodes.find(x => x.id === nodeId);
   if (!n) return { x: 0, y: 0 };
   switch (side) {
-    case 'top':    return { x: n.x + 90, y: n.y };
-    case 'bottom': return { x: n.x + 90, y: n.y + 90 };
+    case 'top':    return { x: n.x + 150, y: n.y };
+    case 'bottom': return { x: n.x + 150, y: n.y + 90 };
     case 'left':   return { x: n.x, y: n.y + 45 };
     case 'right':  return { x: n.x + 300, y: n.y + 45 };
   }
@@ -159,9 +159,28 @@ function renderLinks() {
     const isVirtual = link.type === 'virtual';
     const isDashed = isWifi || isVirtual;
     const color = LINK_COLORS[link.type] || '#27ae60';
-    const dx = Math.abs(tgt.x - src.x);
-    const cp1x = src.x + dx * 0.4, cp1y = src.y;
-    const cp2x = tgt.x - dx * 0.4, cp2y = tgt.y;
+    const dx = tgt.x - src.x;
+    const dy = tgt.y - src.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    // Offset перпендикулярно направлению связи
+    let cp1x = src.x, cp1y = src.y, cp2x = tgt.x, cp2y = tgt.y;
+    if (absDx > absDy) {
+      // Горизонтальная: отклонение по Y
+      const offset = Math.max(40, absDy * 0.3);
+      cp1x = src.x + dx * 0.4;
+      cp1y = src.y + (link.sourceSide === 'top' ? offset : -offset);
+      cp2x = tgt.x - dx * 0.4;
+      cp2y = tgt.y + (link.targetSide === 'top' ? -offset : offset);
+    } else {
+      // Вертикальная: отклонение по X
+      const offset = Math.max(40, absDx * 0.3);
+      cp1x = src.x + (link.sourceSide === 'left' ? -offset : offset);
+      cp1y = src.y + dy * 0.4;
+      cp2x = tgt.x + (link.targetSide === 'left' ? offset : -offset);
+      cp2y = tgt.y - dy * 0.4;
+    }
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
 
     // 1. Группа для всей связи
