@@ -644,6 +644,24 @@ function importMap(event) {
   reader.readAsText(file); event.target.value = '';
 }
 
+async function exportNebulaConfig() {
+  showStatus('Экспорт в nebula-config...', false);
+  try {
+    const res = await fetch('/api/export/nebula');
+    if (!res.ok) throw new Error('Export failed');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nebula-config-export.yaml';
+    a.click();
+    URL.revokeObjectURL(url);
+    showStatus('Конфиг экспортирован', true);
+  } catch (e) {
+    showStatus('Ошибка экспорта: ' + e.message, false);
+  }
+}
+
 // ═══════════════════════════════════════════
 //  KEYBOARD
 // ═══════════════════════════════════════════

@@ -67,6 +67,84 @@ fastify.post('/api/shutdown', async (request, reply) => {
   setTimeout(() => process.exit(0), 2000);
 });
 
+// GET /api/export/nebula — export map as nebula config YAML
+fastify.get('/api/export/nebula', async (request, reply) => {
+  if (!existsSync(DATA_FILE)) {
+    reply.code(404);
+    return { error: 'No map data' };
+  }
+  let mapData;
+  try {
+    mapData = JSON.parse(readFileSync(DATA_FILE, 'utf-8'));
+  } catch {
+    reply.code(500);
+    return { error: 'Invalid data.json' };
+  }
+
+  const nodes = mapData.nodes || [];
+  const hosts = {};
+  let lighthouseName = null;
+
+  for (const n of nodes) {
+    const name = (n.label || 'unnamed').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (!name) continue;
+
+    const entry = {};
+    const groups = (n.desc || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (groups.length) entry.groups = groups;
+
+    if (n.ip_nebula) entry['nebula_ip'] = { ipv4: n.ip_nebula + '/24' };
+    if (n.ip_public) entry.public_ip = n.ip_public;
+    if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
+
+    if (n.desc && n.desc.toLowerCase().includes('маяк')) {
+      lighthouseName = name;
+      entry.am_relay = true;
+      entry.am_lh = true;
+    }
+
+    hosts[name] = entry;
+  }
+
+  // Build YAML manually
+  let yaml = '# Auto-generated from network-map\n';
+  yaml += '# Generated: ' + new Date().toISOString() + '\n\n';
+
+  yaml += 'net-name: my-vpn-network\n';
+  yaml += 'dev: nebula1\n\n';
+
+  yaml += 'lighthouse:\n';
+  for (const [name, host] of Object.entries(hosts)) {
+    if (host.am_lh) {
+      yaml += `  ${name}:\n`;
+      if (host.groups) yaml += `    groups: ${host.groups.join(',')}\n`;
+      if (host['nebula_ip']) yaml += `    nebula_ip: ${host['nebula_ip']}\n`;
+      if (host.port) yaml += `    port: ${host.port}\n`;
+      if (host.public_ip) yaml += `    public_ip: ${host.public_ip}\n`;
+      yaml += `    am_relay: true\n`;
+      yaml += `    am_lh: true\n`;
+    }
+  }
+  yaml += '\nhosts:\n';
+  for (const [name, host] of Object.entries(hosts)) {
+    yaml += `  # ${host.am_lh ? 'Lighthouse' : 'Host'}\n`;
+    yaml += `  ${name}:\n`;
+    if (host.groups) yaml += `    groups: ${host.groups.join(',')}\n`;
+    if (host['nebula_ip']) yaml += `    nebula_ip: ${host['nebula_ip']}\n`;
+    if (host.public_ip) yaml += `    public_ip: ${host.public_ip}\n`;
+    if (host.port !== undefined) yaml += `    port: ${host.port}\n`;
+    yaml += '\n';
+  }
+
+  // Save to file
+  const outputPath = join(__dirname, 'nebula-config-export.yaml');
+  writeFileSync(outputPath, yaml, 'utf-8');
+
+  reply.header('Content-Disposition', 'attachment; filename="nebula-config-export.yaml"');
+  reply.type('text/yaml; charset=utf-8');
+  return yaml;
+});
+
 // Serve static files manually
 fastify.get('/*', async (request, reply) => {
   let filePath = request.url;
