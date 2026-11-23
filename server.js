@@ -164,7 +164,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   yaml += '# ----------------------------------------------------------\n';
   yaml += 'hosts:\n';
   for (const [name, h] of Object.entries(hosts)) {
-    yaml += '  # ' + (h.am_lh ? 'Lighthouse' : 'Host') + '\n';
+    // Пропускаем lighthouse — он уже в секции lighthouse
+    if (h.am_lh) continue;
+    yaml += '  # Host\n';
     yaml += '  ' + name + ':\n';
     if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
     if (h['nebula_ip']) {
