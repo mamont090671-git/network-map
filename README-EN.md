@@ -14,7 +14,7 @@ cd network-map
 # or: npm install && npm start
 ```
 
-Server runs on `http://0.0.0.0:3000`.
+Server runs on `http://127.0.0.1:3000` (localhost only).
 
 ## Features
 

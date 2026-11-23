@@ -14,7 +14,7 @@ cd network-map
 # или: npm install && npm start
 ```
 
-Сервер на `http://0.0.0.0:3000`.
+Сервер на `http://127.0.0.1:3000` (только localhost).
 
 ## Возможности
 

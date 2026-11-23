@@ -260,5 +260,5 @@ fastify.get('/*', async (request, reply) => {
   return reply.send(createReadStream(fullPath));
 });
 
-await fastify.listen({ port: PORT, host: '0.0.0.0' });
-console.log(`Network Map server running on http://0.0.0.0:${PORT}`);
+await fastify.listen({ port: PORT, host: '127.0.0.1' });
+console.log(`Network Map server running on http://127.0.0.1:${PORT}`);
