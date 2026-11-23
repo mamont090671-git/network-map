@@ -54,7 +54,7 @@ function getConnPoint(nodeId, side) {
     case 'top':    return { x: n.x + 90, y: n.y };
     case 'bottom': return { x: n.x + 90, y: n.y + 90 };
     case 'left':   return { x: n.x, y: n.y + 45 };
-    case 'right':  return { x: n.x + 350, y: n.y + 45 };
+    case 'right':  return { x: n.x + 300, y: n.y + 45 };
   }
   return { x: n.x + 90, y: n.y + 45 };
 }
@@ -303,7 +303,7 @@ function updateMinimap() {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(n => {
     minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
-    maxX = Math.max(maxX, n.x + 350); maxY = Math.max(maxY, n.y + 90);
+    maxX = Math.max(maxX, n.x + 300); maxY = Math.max(maxY, n.y + 90);
   });
   if (minX === Infinity) { minX = -200; minY = -200; maxX = 200; maxY = 200; }
   const pad = 20, rangeX = maxX - minX + pad * 2 || 1, rangeY = maxY - minY + pad * 2 || 1;
@@ -320,7 +320,7 @@ function updateMinimap() {
   nodes.forEach(n => {
     const p = toMM(n.x, n.y);
     minimapCtx.fillStyle = NODE_COLORS[n.type] || '#4a90d9';
-    minimapCtx.fillRect(p.x, p.y, Math.max(4, 350 * scale), Math.max(2, 90 * scale));
+    minimapCtx.fillRect(p.x, p.y, Math.max(4, 300 * scale), Math.max(2, 90 * scale));
   });
   const wSize = wrap.getBoundingClientRect(), vw = wSize.width / zoom, vh = wSize.height / zoom;
   const vt = { x: -panX / zoom, y: -panY / zoom };
