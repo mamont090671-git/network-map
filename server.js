@@ -97,8 +97,8 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.groups && Array.isArray(n.groups) && n.groups.length) entry.groups = n.groups;
 
     const nebula_ip = {};
-    if (n.ip_nebula) nebula_ip.ipv4 = n.ip_nebula + '/24';
-    if (n.ipv6_nebula) nebula_ip.ipv6 = n.ipv6_nebula + '/64';
+    if (n.ip_nebula) nebula_ip.ipv4 = n.ip_nebula.split('/')[0] + '/24';
+    if (n.ipv6_nebula) nebula_ip.ipv6 = n.ipv6_nebula.split('/')[0] + '/64';
     if (Object.keys(nebula_ip).length) entry['nebula_ip'] = nebula_ip;
     if (n.ip_public) entry.public_ip = n.ip_public;
     if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
