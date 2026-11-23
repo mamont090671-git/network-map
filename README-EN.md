@@ -60,7 +60,7 @@ Deletion: click red ✕ on link.
 
 - `net-name` and `dev` from `network-settings.json`
 - `relay_servers` — all lighthouse IPs
-- `lighthouse` — section with am_relay/am_lh
+- `lighthouse` — section with am_relay
 - `hosts` — all nodes (lighthouse not duplicated)
 - Each host: groups, nebula_ip (ipv4/ipv6), public_ip, port
 - File saved on server as `nebula-config-export.yaml` and downloaded

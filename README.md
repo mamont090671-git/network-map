@@ -60,7 +60,7 @@ cd network-map
 
 - `net-name` и `dev` из `network-settings.json`
 - `relay_servers` — IP всех lighthouse
-- `lighthouse` — секция с am_relay/am_lh
+- `lighthouse` — секция с am_relay
 - `hosts` — все узлы (lighthouse не дублируется)
 - Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port
 - Файл сохраняется на сервере как `nebula-config-export.yaml` и скачивается
