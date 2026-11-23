@@ -103,10 +103,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.ip_public) entry.public_ip = n.ip_public;
     if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
 
-    if (n.desc && n.desc.toLowerCase().includes('маяк')) {
+    if (n.is_lh) {
       lighthouses.push(name);
       entry.am_relay = true;
-      entry.am_lh = true;
     }
 
     hosts[name] = entry;

@@ -442,6 +442,7 @@ function openAddNode() {
   document.getElementById('nm-ipv6-nebula').value = '';
   document.getElementById('nm-groups').value = '';
   document.getElementById('nm-port-nebula').value = '';
+  document.getElementById('nm-is-lh').checked = false;
   document.getElementById('nm-ip-public').value = '';
   document.getElementById('nm-ip-local').value = '';
   document.getElementById('nm-desc').value = '';
@@ -460,6 +461,7 @@ function openEditNode(id) {
   document.getElementById('nm-ipv6-nebula').value = n.ipv6_nebula || '';
   document.getElementById('nm-groups').value = (n.groups || []).join(',');
   document.getElementById('nm-port-nebula').value = n.port_nebula || '';
+  document.getElementById('nm-is-lh').checked = !!n.is_lh;
   document.getElementById('nm-ip-public').value = n.ip_public || '';
   document.getElementById('nm-ip-local').value = n.ip_local || '';
   document.getElementById('nm-desc').value = n.desc || '';
@@ -475,13 +477,14 @@ function saveNodeModal() {
   const ip_nebula = document.getElementById('nm-ip-nebula').value.trim();
   const ipv6_nebula = document.getElementById('nm-ipv6-nebula').value.trim();
   const groups_str = document.getElementById('nm-groups').value.trim();
+  const is_lh = document.getElementById('nm-is-lh').checked;
   const port_nebula = document.getElementById('nm-port-nebula').value.trim();
   const ip_public = document.getElementById('nm-ip-public').value.trim();
   const ip_local = document.getElementById('nm-ip-local').value.trim();
   const desc = document.getElementById('nm-desc').value.trim();
   if (editingNode) {
     editingNode.label = label; editingNode.type = type;
-    editingNode.ip_nebula = ip_nebula; editingNode.ipv6_nebula = ipv6_nebula; editingNode.groups = groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : []; editingNode.port_nebula = port_nebula; editingNode.ip_public = ip_public; editingNode.ip_local = ip_local;
+    editingNode.ip_nebula = ip_nebula; editingNode.ipv6_nebula = ipv6_nebula; editingNode.groups = groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : []; editingNode.port_nebula = port_nebula; editingNode.is_lh = is_lh; editingNode.ip_public = ip_public; editingNode.ip_local = ip_local;
     editingNode.desc = desc;
     showStatus('Узел обновлён', true);
   } else {
@@ -490,7 +493,7 @@ function saveNodeModal() {
     const cy = (wSize.height / 2 - panY) / zoom - 45;
     const newNode = {
       id: crypto.randomUUID(), label, type,
-      ip_nebula, ipv6_nebula, groups: groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : [], port_nebula, ip_public, ip_local, desc,
+      ip_nebula, ipv6_nebula, groups: groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : [], port_nebula, is_lh, ip_public, ip_local, desc,
       x: snap(cx), y: snap(cy),
       color: NODE_COLORS[type] || '#4a90d9',
       created_at: new Date().toISOString(),
