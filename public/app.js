@@ -153,8 +153,8 @@ function renderNodes() {
 function renderLinks() {
   svgLayer.innerHTML = '';
   links.forEach(link => {
-    const src = getConnPoint(link.source, 'right');
-    const tgt = getConnPoint(link.target, 'left');
+    const src = getConnPoint(link.source, link.sourceSide || 'right');
+    const tgt = getConnPoint(link.target, link.targetSide || 'left');
     const isWifi = link.type === 'wifi';
     const isVirtual = link.type === 'virtual';
     const isDashed = isWifi || isVirtual;
@@ -314,8 +314,8 @@ function updateMinimap() {
   const offX = (mw - rangeX * scale) / 2, offY = (mh - rangeY * scale) / 2;
   function toMM(wx, wy) { return { x: (wx - minX + pad) * scale + offX, y: (wy - minY + pad) * scale + offY }; }
   links.forEach(link => {
-    const s = toMM(getConnPoint(link.source, 'right').x, getConnPoint(link.source, 'right').y);
-    const t = toMM(getConnPoint(link.target, 'left').x, getConnPoint(link.target, 'left').y);
+    const s = toMM(getConnPoint(link.source, link.sourceSide || 'right').x, getConnPoint(link.source, link.sourceSide || 'right').y);
+    const t = toMM(getConnPoint(link.target, link.targetSide || 'left').x, getConnPoint(link.target, link.targetSide || 'left').y);
     minimapCtx.strokeStyle = LINK_COLORS[link.type] || '#27ae60';
     minimapCtx.lineWidth = 1;
     minimapCtx.beginPath(); minimapCtx.moveTo(s.x, s.y); minimapCtx.lineTo(t.x, t.y); minimapCtx.stroke();
@@ -373,8 +373,12 @@ document.addEventListener('mouseup', (e) => {
     if (target) {
       const targetId = target.dataset.node || target.dataset.id;
       if (targetId && targetId !== linkSourceNode) {
+        const sourceSide = linkSourceSide;
+        const targetEl = e.target.closest('.conn-dot');
+        const targetSide = targetEl ? targetEl.dataset.side : 'left';
         links.push({
           id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
+          sourceSide, targetSide,
           type: currentLinkType, label: '', details: '', created_at: new Date().toISOString(),
         });
         saveMap(); renderAll(); showStatus('Связь создана', true);
