@@ -173,6 +173,29 @@ function renderLinks() {
     const cp1x = src.x + dx * 0.4, cp1y = src.y;
     const cp2x = tgt.x - dx * 0.4, cp2y = tgt.y;
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
+    // Невидимая широкая область клика
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hit.setAttribute('d', d);
+    hit.setAttribute('stroke', 'transparent');
+    hit.setAttribute('stroke-width', '20');
+    hit.setAttribute('fill', 'none');
+    hit.setAttribute('pointer-events', 'stroke');
+    hit.style.cursor = 'pointer';
+    hit.dataset.linkId = link.id;
+    hit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let px = e.clientX, py = e.clientY;
+      // Не даём popup улететь за экран
+      const pw = 220, ph = 100;
+      if (px + pw > window.innerWidth) px = window.innerWidth - pw;
+      if (py + ph > window.innerHeight) py = window.innerHeight - ph;
+      linkPopup.style.left = px + 'px';
+      linkPopup.style.top = py + 'px';
+      linkPopup.classList.add('open');
+      editingLink = link;
+    });
+    svgLayer.appendChild(hit);
+    // Видимая линия
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', d);
     path.setAttribute('stroke', color);
@@ -181,13 +204,6 @@ function renderLinks() {
     path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
     path.setAttribute('opacity', '0.8');
     path.dataset.linkId = link.id;
-    path.addEventListener('click', (e) => {
-      e.stopPropagation();
-      linkPopup.style.left = e.clientX + 'px';
-      linkPopup.style.top = e.clientY + 'px';
-      linkPopup.classList.add('open');
-      editingLink = link;
-    });
     svgLayer.appendChild(path);
   });
   let defs = svgLayer.querySelector('defs');
