@@ -410,7 +410,22 @@ document.addEventListener('mouseup', (e) => {
       if (targetId && targetId !== linkSourceNode) {
         const sourceSide = linkSourceSide;
         const targetEl = e.target.closest('.conn-dot');
-        const targetSide = targetEl ? targetEl.dataset.side : 'left';
+        let targetSide = targetEl ? targetEl.dataset.side : null;
+        // Автоопределение ближайшей стороны если conn-dot не пойман
+        if (!targetEl) {
+          const tgt = nodes.find(x => x.id === targetId);
+          if (tgt && tgt.x !== undefined) {
+            const srcPt = getConnPoint(linkSourceNode, linkSourceSide || 'right');
+            const dx = (tgt.x + 150) - srcPt.x;
+            const dy = (tgt.y + 45) - srcPt.y;
+            if (Math.abs(dx) > Math.abs(dy)) {
+              targetSide = dx > 0 ? 'right' : 'left';
+            } else {
+              targetSide = dy > 0 ? 'bottom' : 'top';
+            }
+          }
+        }
+        if (!targetSide) targetSide = 'left';
         links.push({
           id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
           sourceSide, targetSide,
