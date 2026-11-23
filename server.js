@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import { readFileSync, writeFileSync, existsSync, createReadStream } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
