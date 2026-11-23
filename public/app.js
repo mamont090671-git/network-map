@@ -173,7 +173,17 @@ function renderLinks() {
     const cp1x = src.x + dx * 0.4, cp1y = src.y;
     const cp2x = tgt.x - dx * 0.4, cp2y = tgt.y;
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
-    // Невидимая широкая область клика
+    // Видимая линия
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '3');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
+    path.setAttribute('opacity', '0.8');
+    path.dataset.linkId = link.id;
+    svgLayer.appendChild(path);
+    // Невидимая широкая область клика (ПОСЛЕ круга — не блокирует)
     const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hit.setAttribute('d', d);
     hit.setAttribute('stroke', 'transparent');
@@ -194,16 +204,6 @@ function renderLinks() {
       editingLink = link;
     });
     svgLayer.appendChild(hit);
-    // Видимая линия
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', d);
-    path.setAttribute('stroke', color);
-    path.setAttribute('stroke-width', '3');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-dasharray', isDashed ? '8,6' : 'none');
-    path.setAttribute('opacity', '0.8');
-    path.dataset.linkId = link.id;
-    svgLayer.appendChild(path);
     // Красная кнопка ✕ в середине линии
     const midX = (src.x + tgt.x) / 2;
     const midY = (cp1y + cp2y) / 2;
@@ -215,6 +215,7 @@ function renderLinks() {
     delBtn.setAttribute('stroke', '#fff');
     delBtn.setAttribute('stroke-width', '2');
     delBtn.setAttribute('cursor', 'pointer');
+    delBtn.style.pointerEvents = 'all';
     delBtn.style.opacity = '0';
     delBtn.style.transition = 'opacity .2s';
     delBtn.dataset.linkId = link.id;
