@@ -152,7 +152,6 @@ fastify.get('/api/export/nebula', async (request, reply) => {
       if (h.port) yaml += '    port: ' + h.port + '\n';
       if (h.public_ip) yaml += '    public_ip: ' + h.public_ip + '\n';
       yaml += '    am_relay: true\n';
-      yaml += '    am_lh: true\n';
       yaml += '\n';
     }
   } else {
