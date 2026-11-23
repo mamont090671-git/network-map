@@ -119,7 +119,7 @@ function renderNodes() {
     const icon = ICONS[n.type] || ICONS.other;
     el.innerHTML = `
       <div class="node-header"><span class="icon">${icon}</span><span>${esc(n.label)}</span></div>
-      <div class="node-body"><span>${n.ip_public || '—'}</span><span>${n.ip_local || '—'}</span></div>
+      <div class="node-body"><span>${n.ip_public || '—'}</span><span>${n.ip_nebula || '—'}</span><span>${n.ip_local || '—'}</span></div>
       <div class="node-actions">
         <button class="edit" onclick="event.stopPropagation(); openEditNode('${n.id}')" title="Редактировать">✏</button>
         <button class="del" onclick="event.stopPropagation(); deleteNode('${n.id}')" title="Удалить">✕</button>
@@ -356,6 +356,7 @@ function openAddNode() {
   document.getElementById('node-modal-title').textContent = 'Новый узел';
   document.getElementById('nm-label').value = '';
   document.getElementById('nm-type').value = 'server';
+  document.getElementById('nm-ip-nebula').value = '';
   document.getElementById('nm-ip-public').value = '';
   document.getElementById('nm-ip-local').value = '';
   document.getElementById('nm-desc').value = '';
@@ -370,6 +371,7 @@ function openEditNode(id) {
   document.getElementById('node-modal-title').textContent = 'Редактировать узел';
   document.getElementById('nm-label').value = n.label;
   document.getElementById('nm-type').value = n.type;
+  document.getElementById('nm-ip-nebula').value = n.ip_nebula || '';
   document.getElementById('nm-ip-public').value = n.ip_public || '';
   document.getElementById('nm-ip-local').value = n.ip_local || '';
   document.getElementById('nm-desc').value = n.desc || '';
@@ -382,12 +384,13 @@ function closeNodeModal() { document.getElementById('node-modal').classList.remo
 function saveNodeModal() {
   const label = document.getElementById('nm-label').value.trim() || 'Без названия';
   const type = document.getElementById('nm-type').value;
+  const ip_nebula = document.getElementById('nm-ip-nebula').value.trim();
   const ip_public = document.getElementById('nm-ip-public').value.trim();
   const ip_local = document.getElementById('nm-ip-local').value.trim();
   const desc = document.getElementById('nm-desc').value.trim();
   if (editingNode) {
     editingNode.label = label; editingNode.type = type;
-    editingNode.ip_public = ip_public; editingNode.ip_local = ip_local;
+    editingNode.ip_nebula = ip_nebula; editingNode.ip_public = ip_public; editingNode.ip_local = ip_local;
     editingNode.desc = desc;
     showStatus('Узел обновлён', true);
   } else {
@@ -396,7 +399,7 @@ function saveNodeModal() {
     const cy = (wSize.height / 2 - panY) / zoom - 45;
     const newNode = {
       id: crypto.randomUUID(), label, type,
-      ip_public, ip_local, desc,
+      ip_nebula, ip_public, ip_local, desc,
       x: snap(cx), y: snap(cy),
       color: NODE_COLORS[type] || '#4a90d9',
       created_at: new Date().toISOString(),
