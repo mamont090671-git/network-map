@@ -185,7 +185,6 @@ function renderLinks() {
     hit.addEventListener('click', (e) => {
       e.stopPropagation();
       let px = e.clientX, py = e.clientY;
-      // Не даём popup улететь за экран
       const pw = 220, ph = 100;
       if (px + pw > window.innerWidth) px = window.innerWidth - pw;
       if (py + ph > window.innerHeight) py = window.innerHeight - ph;
@@ -205,6 +204,46 @@ function renderLinks() {
     path.setAttribute('opacity', '0.8');
     path.dataset.linkId = link.id;
     svgLayer.appendChild(path);
+    // Красная кнопка ✕ в середине линии
+    const midX = (src.x + tgt.x) / 2;
+    const midY = (cp1y + cp2y) / 2;
+    const delBtn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    delBtn.setAttribute('cx', midX);
+    delBtn.setAttribute('cy', midY);
+    delBtn.setAttribute('r', '10');
+    delBtn.setAttribute('fill', '#e94560');
+    delBtn.setAttribute('stroke', '#fff');
+    delBtn.setAttribute('stroke-width', '2');
+    delBtn.setAttribute('cursor', 'pointer');
+    delBtn.style.opacity = '0';
+    delBtn.style.transition = 'opacity .2s';
+    delBtn.dataset.linkId = link.id;
+    delBtn.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
+    delBtn.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(`Удалить связь?`)) {
+        links = links.filter(l => l.id !== link.id);
+        saveMap(); renderAll(); showStatus('Связь удалена', true);
+      }
+    });
+    svgLayer.appendChild(delBtn);
+    // Кнопка ✕ (текст)
+    const delText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    delText.setAttribute('x', midX);
+    delText.setAttribute('y', midY + 4);
+    delText.setAttribute('text-anchor', 'middle');
+    delText.setAttribute('fill', '#fff');
+    delText.setAttribute('font-size', '12');
+    delText.setAttribute('font-weight', 'bold');
+    delText.setAttribute('pointer-events', 'none');
+    delText.textContent = '✕';
+    delText.style.opacity = '0';
+    delText.style.transition = 'opacity .2s';
+    delText.dataset.linkId = link.id;
+    delText.addEventListener('mouseenter', () => delText.style.opacity = '1');
+    delText.addEventListener('mouseleave', () => delText.style.opacity = '0');
+    svgLayer.appendChild(delText);
   });
   let defs = svgLayer.querySelector('defs');
   if (!defs) {
