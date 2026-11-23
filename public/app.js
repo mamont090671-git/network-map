@@ -34,7 +34,7 @@ const NODE_COLORS = {
   storage: '#2c3e50', phone: '#f39c12', ap: '#3498db',
   other: '#95a5a6',
 };
-const LINK_COLORS = { physical: '#27ae60', wifi: '#2980b9', virtual: '#27ae60' };
+const LINK_COLORS = { physical: '#27ae60', wifi: '#2980b9', virtual: '#8e44ad' };
 
 // ═══════════════════════════════════════════
 //  UTILS
@@ -141,19 +141,6 @@ function renderNodes() {
         dot.style.background = '#fff';
         dot.style.transform = 'scale(2)';
         showStatus('Тяните к целевому узлу...', false);
-      });
-      dot.addEventListener('mouseup', (e) => {
-        e.stopPropagation();
-        const targetId = dot.dataset.node;
-        if (targetId && targetId !== linkSourceNode) {
-          links.push({
-            id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
-            type: currentLinkType, label: '', details: '', created_at: new Date().toISOString(),
-          });
-          linkMode = false; linkSourceNode = null; linkSourceSide = null;
-          currentLinkType = 'physical';
-          saveMap(); renderAll(); showStatus('Связь создана', true);
-        }
       });
     });
     canvas.appendChild(el);
