@@ -1,0 +1,24 @@
+{
+  "nodes": [
+    {
+      "id": "example-node-uuid",
+      "label": "lighthouse-example",
+      "type": "server",
+      "ip": "192.168.10.1",
+      "desc": "\u041c\u0430\u044f\u043a",
+      "x": 50,
+      "y": 20,
+      "color": "#4a90d9",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "ip_nebula": "10.128.0.1",
+      "ipv6_nebula": "fd00:1234:5678:a::1",
+      "port_nebula": "4242",
+      "ip_public": "",
+      "ip_local": "",
+      "groups": [
+        "home"
+      ]
+    }
+  ],
+  "links": []
+}
