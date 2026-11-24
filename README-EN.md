@@ -16,6 +16,10 @@ cd network-map
 
 Server runs on `http://127.0.0.1:3000` (localhost only).
 
+## Screenshot
+
+![Network Map — Nebula network topology visualization](screenshots/network-map-full.png)
+
 ## Features
 
 ### Nodes
