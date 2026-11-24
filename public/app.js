@@ -56,7 +56,7 @@ function getConnPoint(nodeId, side) {
     case 'left':   return { x: n.x, y: n.y + 45 };
     case 'right':  return { x: n.x + 300, y: n.y + 45 };
   }
-  return { x: n.x + 90, y: n.y + 45 };
+  return { x: n.x + 150, y: n.y + 45 };
 }
 function screenToWorld(sx, sy) { return { x: (sx - panX) / zoom, y: (sy - panY) / zoom }; }
 
@@ -543,7 +543,7 @@ function saveNodeModal() {
     showStatus('Узел обновлён', true);
   } else {
     const wSize = wrap.getBoundingClientRect();
-    const cx = (wSize.width / 2 - panX) / zoom - 90;
+    const cx = (wSize.width / 2 - panX) / zoom - 150;
     const cy = (wSize.height / 2 - panY) / zoom - 45;
     const newNode = {
       id: crypto.randomUUID(), label, type,
