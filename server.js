@@ -101,7 +101,10 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     if (n.ipv6_nebula) nebula_ip.ipv6 = n.ipv6_nebula.split('/')[0] + '/64';
     if (Object.keys(nebula_ip).length) entry['nebula_ip'] = nebula_ip;
     if (n.ip_public) entry.public_ip = n.ip_public;
-    if (n.port_nebula) entry.port = parseInt(n.port_nebula, 10);
+    if (n.port_nebula) {
+      const parsedPort = parseInt(n.port_nebula, 10);
+      if (!isNaN(parsedPort)) entry.port = parsedPort;
+    }
 
     if (hosts[name]) {
       let suff = 2;
