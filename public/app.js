@@ -766,7 +766,7 @@ document.addEventListener('keydown', (e) => {
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedNodeId && !e.target.closest('input,textarea,select')) {
     deleteNode(selectedNodeId);
   }
-  if (e.key === 'Escape') { closeNodeModal(); closeLinkModal(); clearLinkPreview(); }
+  if (e.key === 'Escape') { closeNetSettings(); closeNodeModal(); closeLinkModal(); clearLinkPreview(); }
 });
 
 // ═══════════════════════════════════════════
