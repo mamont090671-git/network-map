@@ -124,6 +124,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
         entry.port = parsedPort;
       }
     }
+    if (n.ssh_target) {
+      entry.ssh_target = n.ssh_target;
+    }
 
     if (hosts[name]) {
       let suff = 2;
