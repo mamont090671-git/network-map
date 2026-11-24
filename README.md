@@ -16,6 +16,10 @@ cd network-map
 
 Сервер на `http://127.0.0.1:3000` (только localhost).
 
+## Скриншот
+
+![Network Map — визуализация топологии сети](screenshots/network-map-full.png)
+
 ## Возможности
 
 ### Узлы
