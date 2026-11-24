@@ -120,7 +120,7 @@ function renderNodes() {
     el.style.borderColor = NODE_COLORS[n.type] || '#4a90d9';
     const icon = ICONS[n.type] || ICONS.other;
     el.innerHTML = `
-      <div class="node-header"><span class="icon">${icon}</span><span>${esc(n.label)}</span>${n.is_lh ? " <span class="lh-badge">🗼 LH</span>" : ""}</div>
+      <div class='node-header'><span class='icon'>${icon}</span><span>${esc(n.label)}</span>${n.is_lh ? ' <span class="lh-badge">🗼 LH</span>' : ''}</div>
       <div class="node-body"><span class="ip-col"><span class="ip-label">v4</span><span>${n.ip_nebula || '—'}</span>${n.port_nebula ? '<span class="ip-port">:' + n.port_nebula + '</span>' : ''}</span></div>
       <div class="node-body"><span class="ip-col"><span class="ip-label">v6</span><span>${n.ipv6_nebula || '—'}</span></span></div>
       <div class="node-body"><span class="ip-col"><span class="ip-label">pub</span><span>${n.ip_public || '—'}</span></span></div>
