@@ -54,7 +54,7 @@ LOG_FILE="$SCRIPT_DIR/server.log"
 
 # Запуск
 echo ""
-echo -e "${YELLOW}  Запуск на http://0.0.0.0:${PORT}${NC}"
+echo -e "${YELLOW}  Запуск на http://127.0.0.1:${PORT}${NC}"
 echo -e "${YELLOW}  Лог: $LOG_FILE${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
