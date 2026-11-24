@@ -716,7 +716,7 @@ async function exportNebulaConfig() {
     const res = await fetch('/api/export/nebula');
     if (!res.ok) throw new Error('Export failed');
     const data = await res.json();
-    if (data.ok) showStatus('Конфиг сохранён: nebula-config.yaml', true);
+    if (data.ok) showStatus('Конфиг сохранён: config-nebula.yaml', true);
     else throw new Error(data.error || 'Export failed');
   } catch (e) {
     showStatus('Ошибка экспорта: ' + e.message, false);
