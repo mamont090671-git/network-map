@@ -3,14 +3,23 @@
 // ═══════════════════════════════════════════
 let nodes = [];
 let links = [];
-let panX = 0, panY = 0, zoom = 1;
-let dragNode = null, dragOffX = 0, dragOffY = 0;
-let panStart = null, isPanning = false;
-let linkMode = false, linkSourceNode = null, linkSourceSide = null;
+let panX = 0,
+  panY = 0,
+  zoom = 1;
+let dragNode = null,
+  dragOffX = 0,
+  dragOffY = 0;
+let panStart = null,
+  isPanning = false;
+let linkMode = false,
+  linkSourceNode = null,
+  linkSourceSide = null;
 let linkPreviewLine = null;
 let currentLinkType = 'physical';
 let selectedNodeId = null;
-let editingNode = null, editingLink = null, editingNodeFromPopup = null;
+let editingNode = null,
+  editingLink = null,
+  editingNodeFromPopup = null;
 let nodePopupNode = null;
 
 const canvas = document.getElementById('canvas');
@@ -24,14 +33,27 @@ const minimapCanvas = document.getElementById('minimap-canvas');
 const minimapCtx = minimapCanvas.getContext('2d');
 
 const ICONS = {
-  server: '🖥', switch: '🔀', router: '🌐', firewall: '🛡',
-  pc: '💻', printer: '🖨', storage: '💾', phone: '📱',
-  ap: '📡', other: '⚙️',
+  server: '🖥',
+  switch: '🔀',
+  router: '🌐',
+  firewall: '🛡',
+  pc: '💻',
+  printer: '🖨',
+  storage: '💾',
+  phone: '📱',
+  ap: '📡',
+  other: '⚙️',
 };
 const NODE_COLORS = {
-  server: '#4a90d9', switch: '#27ae60', router: '#e67e22',
-  firewall: '#c0392b', pc: '#8e44ad', printer: '#16a085',
-  storage: '#2c3e50', phone: '#f39c12', ap: '#3498db',
+  server: '#4a90d9',
+  switch: '#27ae60',
+  router: '#e67e22',
+  firewall: '#c0392b',
+  pc: '#8e44ad',
+  printer: '#16a085',
+  storage: '#2c3e50',
+  phone: '#f39c12',
+  ap: '#3498db',
   other: '#95a5a6',
 };
 const LINK_COLORS = { physical: '#27ae60', wifi: '#2980b9', virtual: '#8e44ad' };
@@ -39,26 +61,42 @@ const LINK_COLORS = { physical: '#27ae60', wifi: '#2980b9', virtual: '#8e44ad' }
 // ═══════════════════════════════════════════
 //  UTILS
 // ═══════════════════════════════════════════
-function snap(v) { return Math.round(v / 10) * 10; }
-function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+function snap(v) {
+  return Math.round(v / 10) * 10;
+}
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
 function showStatus(msg, saved) {
   statusEl.textContent = msg;
   statusEl.className = 'status' + (saved ? ' saved' : '');
   clearTimeout(showStatus._t);
-  showStatus._t = setTimeout(() => { statusEl.textContent = ''; }, 3000);
+  showStatus._t = setTimeout(() => {
+    statusEl.textContent = '';
+  }, 3000);
 }
 function getConnPoint(nodeId, side) {
-  const n = nodes.find(x => x.id === nodeId);
-  if (!n) return { x: 0, y: 0 };
+  const n = nodes.find((x) => x.id === nodeId);
+  if (!n) {
+    return { x: 0, y: 0 };
+  }
   switch (side) {
-    case 'top':    return { x: n.x + 150, y: n.y };
-    case 'bottom': return { x: n.x + 150, y: n.y + 90 };
-    case 'left':   return { x: n.x, y: n.y + 45 };
-    case 'right':  return { x: n.x + 300, y: n.y + 45 };
+    case 'top':
+      return { x: n.x + 150, y: n.y };
+    case 'bottom':
+      return { x: n.x + 150, y: n.y + 90 };
+    case 'left':
+      return { x: n.x, y: n.y + 45 };
+    case 'right':
+      return { x: n.x + 300, y: n.y + 45 };
   }
   return { x: n.x + 150, y: n.y + 45 };
 }
-function screenToWorld(sx, sy) { return { x: (sx - panX) / zoom, y: (sy - panY) / zoom }; }
+function screenToWorld(sx, sy) {
+  return { x: (sx - panX) / zoom, y: (sy - panY) / zoom };
+}
 
 // ═══════════════════════════════════════════
 //  API
@@ -110,8 +148,8 @@ function updateViewport() {
 }
 
 function renderNodes() {
-  canvas.querySelectorAll('.node-card').forEach(el => el.remove());
-  nodes.forEach(n => {
+  canvas.querySelectorAll('.node-card').forEach((el) => el.remove());
+  nodes.forEach((n) => {
     const el = document.createElement('div');
     el.className = 'node-card' + (selectedNodeId === n.id ? ' selected' : '');
     el.dataset.id = n.id;
@@ -135,7 +173,7 @@ function renderNodes() {
       <div class="conn-dot right" data-side="right" data-node="${n.id}"></div>
     `;
     el.addEventListener('mousedown', (e) => onNodeMouseDown(e, n));
-    el.querySelectorAll('.conn-dot').forEach(dot => {
+    el.querySelectorAll('.conn-dot').forEach((dot) => {
       dot.addEventListener('mousedown', (e) => {
         e.stopPropagation();
         linkMode = true;
@@ -152,7 +190,7 @@ function renderNodes() {
 
 function renderLinks() {
   svgLayer.innerHTML = '';
-  links.forEach(link => {
+  links.forEach((link) => {
     const src = getConnPoint(link.source, link.sourceSide || 'right');
     const tgt = getConnPoint(link.target, link.targetSide || 'left');
     const isWifi = link.type === 'wifi';
@@ -165,20 +203,27 @@ function renderLinks() {
     const absDy = Math.abs(dy);
 
     // Offset перпендикулярно направлению связи
-    let cp1x = src.x, cp1y = src.y, cp2x = tgt.x, cp2y = tgt.y;
+    let cp1x = src.x,
+      cp1y = src.y,
+      cp2x = tgt.x,
+      cp2y = tgt.y;
     if (absDx > absDy) {
       // Горизонтальная: отклонение по Y
       const offset = Math.max(40, absDy * 0.3);
       cp1x = src.x + dx * 0.4;
-      cp1y = src.y + (link.sourceSide === 'top' ? -offset : (link.sourceSide === 'bottom' ? offset : 0));
+      cp1y =
+        src.y + (link.sourceSide === 'top' ? -offset : link.sourceSide === 'bottom' ? offset : 0);
       cp2x = tgt.x - dx * 0.4;
-      cp2y = tgt.y + (link.targetSide === 'top' ? -offset : (link.targetSide === 'bottom' ? offset : 0));
+      cp2y =
+        tgt.y + (link.targetSide === 'top' ? -offset : link.targetSide === 'bottom' ? offset : 0);
     } else {
       // Вертикальная: отклонение по X
       const offset = Math.max(40, absDx * 0.3);
-      cp1x = src.x + (link.sourceSide === 'left' ? -offset : (link.sourceSide === 'right' ? offset : 0));
+      cp1x =
+        src.x + (link.sourceSide === 'left' ? -offset : link.sourceSide === 'right' ? offset : 0);
       cp1y = src.y + dy * 0.4;
-      cp2x = tgt.x + (link.targetSide === 'left' ? -offset : (link.targetSide === 'right' ? offset : 0));
+      cp2x =
+        tgt.x + (link.targetSide === 'left' ? -offset : link.targetSide === 'right' ? offset : 0);
       cp2y = tgt.y - dy * 0.4;
     }
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
@@ -228,13 +273,21 @@ function renderLinks() {
     }
 
     // Обработчики кликов на широкой зоне hitPath
-    hitPath.addEventListener('mousedown', e => { e.stopPropagation(); });
+    hitPath.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
     hitPath.addEventListener('click', (e) => {
       e.stopPropagation();
-      let px = e.clientX, py = e.clientY;
-      const pw = 220, ph = 100;
-      if (px + pw > window.innerWidth) px = window.innerWidth - pw;
-      if (py + ph > window.innerHeight) py = window.innerHeight - ph;
+      let px = e.clientX,
+        py = e.clientY;
+      const pw = 220,
+        ph = 100;
+      if (px + pw > window.innerWidth) {
+        px = window.innerWidth - pw;
+      }
+      if (py + ph > window.innerHeight) {
+        py = window.innerHeight - ph;
+      }
       linkPopup.style.left = px + 'px';
       linkPopup.style.top = py + 'px';
       linkPopup.classList.add('open');
@@ -272,10 +325,12 @@ function renderLinks() {
     delText.setAttribute('pointer-events', 'none');
     delText.textContent = '✕';
 
-    delGroup.addEventListener('mousedown', e => { e.stopPropagation(); });
+    delGroup.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
     delGroup.addEventListener('click', (e) => {
       e.stopPropagation();
-      links = links.filter(l => l.id !== link.id);
+      links = links.filter((l) => l.id !== link.id);
       saveMap();
       renderAll();
       showStatus('Связь удалена', true);
@@ -303,7 +358,9 @@ function renderLinks() {
 }
 
 function renderLinkPreview(mx, my) {
-  if (!linkMode || !linkSourceNode) return;
+  if (!linkMode || !linkSourceNode) {
+    return;
+  }
   const src = getConnPoint(linkSourceNode, linkSourceSide);
   const wp = screenToWorld(mx, my);
   if (!linkPreviewLine) {
@@ -321,13 +378,19 @@ function renderLinkPreview(mx, my) {
 }
 
 function clearLinkPreview() {
-  if (linkPreviewLine) { linkPreviewLine.remove(); linkPreviewLine = null; }
+  if (linkPreviewLine) {
+    linkPreviewLine.remove();
+    linkPreviewLine = null;
+  }
   if (linkSourceNode) {
-    document.querySelectorAll(`.conn-dot[data-node="${linkSourceNode}"]`).forEach(d => {
-      d.style.background = ''; d.style.transform = '';
+    document.querySelectorAll(`.conn-dot[data-node="${linkSourceNode}"]`).forEach((d) => {
+      d.style.background = '';
+      d.style.transform = '';
     });
   }
-  linkMode = false; linkSourceNode = null; linkSourceSide = null;
+  linkMode = false;
+  linkSourceNode = null;
+  linkSourceSide = null;
   hideLinkTypePicker();
 }
 
@@ -335,35 +398,66 @@ function clearLinkPreview() {
 //  MINIMAP
 // ═══════════════════════════════════════════
 function updateMinimap() {
-  const mc = minimapCanvas, mw = 180, mh = 120;
-  mc.width = mw; mc.height = mh;
+  const mc = minimapCanvas,
+    mw = 180,
+    mh = 120;
+  mc.width = mw;
+  mc.height = mh;
   minimapCtx.clearRect(0, 0, mw, mh);
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  nodes.forEach(n => {
-    minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
-    maxX = Math.max(maxX, n.x + 300); maxY = Math.max(maxY, n.y + 90);
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  nodes.forEach((n) => {
+    minX = Math.min(minX, n.x);
+    minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x + 300);
+    maxY = Math.max(maxY, n.y + 90);
   });
-  if (minX === Infinity) { minX = -200; minY = -200; maxX = 200; maxY = 200; }
-  const pad = 20, rangeX = maxX - minX + pad * 2 || 1, rangeY = maxY - minY + pad * 2 || 1;
+  if (minX === Infinity) {
+    minX = -200;
+    minY = -200;
+    maxX = 200;
+    maxY = 200;
+  }
+  const pad = 20,
+    rangeX = maxX - minX + pad * 2 || 1,
+    rangeY = maxY - minY + pad * 2 || 1;
   const scale = Math.min(mw / rangeX, mh / rangeY);
-  const offX = (mw - rangeX * scale) / 2, offY = (mh - rangeY * scale) / 2;
-  function toMM(wx, wy) { return { x: (wx - minX + pad) * scale + offX, y: (wy - minY + pad) * scale + offY }; }
-  links.forEach(link => {
-    const s = toMM(getConnPoint(link.source, link.sourceSide || 'right').x, getConnPoint(link.source, link.sourceSide || 'right').y);
-    const t = toMM(getConnPoint(link.target, link.targetSide || 'left').x, getConnPoint(link.target, link.targetSide || 'left').y);
+  const offX = (mw - rangeX * scale) / 2,
+    offY = (mh - rangeY * scale) / 2;
+  function toMM(wx, wy) {
+    return { x: (wx - minX + pad) * scale + offX, y: (wy - minY + pad) * scale + offY };
+  }
+  links.forEach((link) => {
+    const s = toMM(
+      getConnPoint(link.source, link.sourceSide || 'right').x,
+      getConnPoint(link.source, link.sourceSide || 'right').y
+    );
+    const t = toMM(
+      getConnPoint(link.target, link.targetSide || 'left').x,
+      getConnPoint(link.target, link.targetSide || 'left').y
+    );
     minimapCtx.strokeStyle = LINK_COLORS[link.type] || '#27ae60';
     minimapCtx.lineWidth = 1;
-    minimapCtx.beginPath(); minimapCtx.moveTo(s.x, s.y); minimapCtx.lineTo(t.x, t.y); minimapCtx.stroke();
+    minimapCtx.beginPath();
+    minimapCtx.moveTo(s.x, s.y);
+    minimapCtx.lineTo(t.x, t.y);
+    minimapCtx.stroke();
   });
-  nodes.forEach(n => {
+  nodes.forEach((n) => {
     const p = toMM(n.x, n.y);
     minimapCtx.fillStyle = NODE_COLORS[n.type] || '#4a90d9';
     minimapCtx.fillRect(p.x, p.y, Math.max(4, 300 * scale), Math.max(2, 90 * scale));
   });
-  const wSize = wrap.getBoundingClientRect(), vw = wSize.width / zoom, vh = wSize.height / zoom;
+  const wSize = wrap.getBoundingClientRect(),
+    vw = wSize.width / zoom,
+    vh = wSize.height / zoom;
   const vt = { x: -panX / zoom, y: -panY / zoom };
-  const tl = toMM(vt.x, vt.y), br = toMM(vt.x + vw, vt.y + vh);
-  minimapCtx.strokeStyle = '#e94560'; minimapCtx.lineWidth = 1.5;
+  const tl = toMM(vt.x, vt.y),
+    br = toMM(vt.x + vw, vt.y + vh);
+  minimapCtx.strokeStyle = '#e94560';
+  minimapCtx.lineWidth = 1.5;
   minimapCtx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
 }
 
@@ -371,34 +465,58 @@ function updateMinimap() {
 //  MOUSE EVENTS
 // ═══════════════════════════════════════════
 function onNodeMouseDown(e, node) {
-  if (linkMode || e.button !== 0) return;
-  e.preventDefault(); e.stopPropagation();
+  if (linkMode || e.button !== 0) {
+    return;
+  }
+  e.preventDefault();
+  e.stopPropagation();
   const wp = screenToWorld(e.clientX, e.clientY);
-  dragNode = node; dragOffX = wp.x - node.x; dragOffY = wp.y - node.y;
+  dragNode = node;
+  dragOffX = wp.x - node.x;
+  dragOffY = wp.y - node.y;
   const el = canvas.querySelector(`.node-card[data-id="${node.id}"]`);
-  if (el) el.classList.add('dragging');
-  selectedNodeId = node.id; renderAll();
+  if (el) {
+    el.classList.add('dragging');
+  }
+  selectedNodeId = node.id;
+  renderAll();
 }
 
 wrap.addEventListener('mousedown', (e) => {
-  if (e.button === 2 || linkMode || e.target.closest('.node-card')) return;
+  if (e.button === 2 || linkMode || e.target.closest('.node-card')) {
+    return;
+  }
   panStart = { x: e.clientX - panX, y: e.clientY - panY };
-  isPanning = true; selectedNodeId = null; renderAll();
+  isPanning = true;
+  selectedNodeId = null;
+  renderAll();
 });
 
 document.addEventListener('mousemove', (e) => {
-  if (linkMode) { renderLinkPreview(e.clientX, e.clientY); return; }
+  if (linkMode) {
+    renderLinkPreview(e.clientX, e.clientY);
+    return;
+  }
   if (isPanning && panStart) {
-    panX = e.clientX - panStart.x; panY = e.clientY - panStart.y;
-    updateViewport(); updateMinimap(); return;
+    panX = e.clientX - panStart.x;
+    panY = e.clientY - panStart.y;
+    updateViewport();
+    updateMinimap();
+    return;
   }
   if (dragNode) {
     const wp = screenToWorld(e.clientX, e.clientY);
-    const nx = snap(Math.max(0, wp.x - dragOffX)), ny = snap(Math.max(0, wp.y - dragOffY));
-    dragNode.x = nx; dragNode.y = ny;
+    const nx = snap(Math.max(0, wp.x - dragOffX)),
+      ny = snap(Math.max(0, wp.y - dragOffY));
+    dragNode.x = nx;
+    dragNode.y = ny;
     const el = canvas.querySelector(`.node-card[data-id="${dragNode.id}"]`);
-    if (el) { el.style.left = nx + 'px'; el.style.top = ny + 'px'; }
-    renderLinks(); updateMinimap();
+    if (el) {
+      el.style.left = nx + 'px';
+      el.style.top = ny + 'px';
+    }
+    renderLinks();
+    updateMinimap();
   }
 });
 
@@ -413,11 +531,11 @@ document.addEventListener('mouseup', (e) => {
         let targetSide = targetEl ? targetEl.dataset.side : null;
         // Автоопределение ближайшей стороны если conn-dot не пойман
         if (!targetEl) {
-          const tgt = nodes.find(x => x.id === targetId);
+          const tgt = nodes.find((x) => x.id === targetId);
           if (tgt && tgt.x !== undefined) {
             const srcPt = getConnPoint(linkSourceNode, linkSourceSide || 'right');
-            const dx = (tgt.x + 150) - srcPt.x;
-            const dy = (tgt.y + 45) - srcPt.y;
+            const dx = tgt.x + 150 - srcPt.x;
+            const dy = tgt.y + 45 - srcPt.y;
             if (Math.abs(dx) > Math.abs(dy)) {
               targetSide = dx > 0 ? 'right' : 'left';
             } else {
@@ -425,34 +543,56 @@ document.addEventListener('mouseup', (e) => {
             }
           }
         }
-        if (!targetSide) targetSide = 'left';
+        if (!targetSide) {
+          targetSide = 'left';
+        }
         links.push({
-          id: crypto.randomUUID(), source: linkSourceNode, target: targetId,
-          sourceSide, targetSide,
-          type: currentLinkType, label: '', details: '', created_at: new Date().toISOString(),
+          id: crypto.randomUUID(),
+          source: linkSourceNode,
+          target: targetId,
+          sourceSide,
+          targetSide,
+          type: currentLinkType,
+          label: '',
+          details: '',
+          created_at: new Date().toISOString(),
         });
-        saveMap(); renderAll(); showStatus('Связь создана', true);
+        saveMap();
+        renderAll();
+        showStatus('Связь создана', true);
       }
     }
-    clearLinkPreview(); return;
+    clearLinkPreview();
+    return;
   }
-  isPanning = false; panStart = null;
+  isPanning = false;
+  panStart = null;
   if (dragNode) {
     const el = canvas.querySelector(`.node-card[data-id="${dragNode.id}"]`);
-    if (el) el.classList.remove('dragging');
-    saveMap(); dragNode = null;
+    if (el) {
+      el.classList.remove('dragging');
+    }
+    saveMap();
+    dragNode = null;
   }
 });
 
-wrap.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const rect = wrap.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
-  const oldZoom = zoom;
-  zoom = Math.max(0.2, Math.min(3, zoom * (e.deltaY > 0 ? 0.9 : 1.1)));
-  panX = mx - (mx - panX) * (zoom / oldZoom);
-  panY = my - (my - panY) * (zoom / oldZoom);
-  updateViewport(); updateMinimap();
-}, { passive: false });
+wrap.addEventListener(
+  'wheel',
+  (e) => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect(),
+      mx = e.clientX - rect.left,
+      my = e.clientY - rect.top;
+    const oldZoom = zoom;
+    zoom = Math.max(0.2, Math.min(3, zoom * (e.deltaY > 0 ? 0.9 : 1.1)));
+    panX = mx - (mx - panX) * (zoom / oldZoom);
+    panY = my - (my - panY) * (zoom / oldZoom);
+    updateViewport();
+    updateMinimap();
+  },
+  { passive: false }
+);
 
 wrap.addEventListener('contextmenu', (e) => {
   e.preventDefault();
@@ -461,7 +601,7 @@ wrap.addEventListener('contextmenu', (e) => {
   const nodeEl = e.target.closest('.node-card');
   if (nodeEl) {
     selectedNodeId = nodeEl.dataset.id;
-    nodePopupNode = nodes.find(n => n.id === selectedNodeId);
+    nodePopupNode = nodes.find((n) => n.id === selectedNodeId);
     nodePopup.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
     nodePopup.style.top = Math.min(e.clientY, window.innerHeight - 150) + 'px';
     nodePopup.classList.add('open');
@@ -469,7 +609,13 @@ wrap.addEventListener('contextmenu', (e) => {
   }
 });
 document.addEventListener('click', (e) => {
-  if (e.target.closest('.link-popup') || e.target.closest('.node-popup') || e.target.closest('.link-type-picker')) return;
+  if (
+    e.target.closest('.link-popup') ||
+    e.target.closest('.node-popup') ||
+    e.target.closest('.link-type-picker')
+  ) {
+    return;
+  }
   linkPopup.classList.remove('open');
   nodePopup.classList.remove('open');
 });
@@ -480,7 +626,9 @@ document.addEventListener('click', (e) => {
 if (linkTypePicker) {
   linkTypePicker.addEventListener('click', (e) => {
     const btn = e.target.closest('.lt-btn');
-    if (btn) pickLinkType(btn.dataset.type);
+    if (btn) {
+      pickLinkType(btn.dataset.type);
+    }
   });
 }
 
@@ -505,8 +653,10 @@ function openAddNode() {
 }
 
 function openEditNode(id) {
-  const n = nodes.find(x => x.id === id);
-  if (!n) return;
+  const n = nodes.find((x) => x.id === id);
+  if (!n) {
+    return;
+  }
   editingNode = n;
   document.getElementById('node-modal-title').textContent = 'Редактировать узел';
   document.getElementById('nm-label').value = n.label;
@@ -523,7 +673,10 @@ function openEditNode(id) {
   document.getElementById('nm-label').focus();
 }
 
-function closeNodeModal() { document.getElementById('node-modal').classList.remove('open'); editingNode = null; }
+function closeNodeModal() {
+  document.getElementById('node-modal').classList.remove('open');
+  editingNode = null;
+}
 
 function saveNodeModal() {
   const label = document.getElementById('nm-label').value.trim() || 'Без названия';
@@ -537,8 +690,20 @@ function saveNodeModal() {
   const ip_local = document.getElementById('nm-ip-local').value.trim();
   const desc = document.getElementById('nm-desc').value.trim();
   if (editingNode) {
-    editingNode.label = label; editingNode.type = type;
-    editingNode.ip_nebula = ip_nebula; editingNode.ipv6_nebula = ipv6_nebula; editingNode.groups = groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : []; editingNode.port_nebula = port_nebula; editingNode.is_lh = is_lh; editingNode.ip_public = ip_public; editingNode.ip_local = ip_local;
+    editingNode.label = label;
+    editingNode.type = type;
+    editingNode.ip_nebula = ip_nebula;
+    editingNode.ipv6_nebula = ipv6_nebula;
+    editingNode.groups = groups_str
+      ? groups_str
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    editingNode.port_nebula = port_nebula;
+    editingNode.is_lh = is_lh;
+    editingNode.ip_public = ip_public;
+    editingNode.ip_local = ip_local;
     editingNode.desc = desc;
     showStatus('Узел обновлён', true);
   } else {
@@ -546,25 +711,50 @@ function saveNodeModal() {
     const cx = (wSize.width / 2 - panX) / zoom - 150;
     const cy = (wSize.height / 2 - panY) / zoom - 45;
     const newNode = {
-      id: crypto.randomUUID(), label, type,
-      ip_nebula, ipv6_nebula, groups: groups_str ? groups_str.split(',').map(s => s.trim()).filter(Boolean) : [], port_nebula, is_lh, ip_public, ip_local, desc,
-      x: snap(cx), y: snap(cy),
+      id: crypto.randomUUID(),
+      label,
+      type,
+      ip_nebula,
+      ipv6_nebula,
+      groups: groups_str
+        ? groups_str
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+      port_nebula,
+      is_lh,
+      ip_public,
+      ip_local,
+      desc,
+      x: snap(cx),
+      y: snap(cy),
       color: NODE_COLORS[type] || '#4a90d9',
       created_at: new Date().toISOString(),
     };
-    nodes.push(newNode); editingNode = newNode;
+    nodes.push(newNode);
+    editingNode = newNode;
     showStatus('Узел создан', true);
   }
-  closeNodeModal(); saveMap(); renderAll();
+  closeNodeModal();
+  saveMap();
+  renderAll();
 }
 
 function deleteNode(id) {
-  const n = nodes.find(x => x.id === id);
-  if (!n) return;
-  if (!confirm(`Удалить узел "${n.label}" и все связанные связи?`)) return;
-  nodes = nodes.filter(x => x.id !== id);
-  links = links.filter(l => l.source !== id && l.target !== id);
-  selectedNodeId = null; saveMap(); renderAll(); showStatus('Узел удалён', true);
+  const n = nodes.find((x) => x.id === id);
+  if (!n) {
+    return;
+  }
+  if (!confirm(`Удалить узел "${n.label}" и все связанные связи?`)) {
+    return;
+  }
+  nodes = nodes.filter((x) => x.id !== id);
+  links = links.filter((l) => l.source !== id && l.target !== id);
+  selectedNodeId = null;
+  saveMap();
+  renderAll();
+  showStatus('Узел удалён', true);
 }
 
 // ═══════════════════════════════════════════
@@ -572,13 +762,17 @@ function deleteNode(id) {
 // ═══════════════════════════════════════════
 function editNodeFromPopup() {
   nodePopup.classList.remove('open');
-  if (!nodePopupNode) return;
+  if (!nodePopupNode) {
+    return;
+  }
   openEditNode(nodePopupNode.id);
 }
 
 function deleteNodeFromPopup() {
   nodePopup.classList.remove('open');
-  if (!nodePopupNode) return;
+  if (!nodePopupNode) {
+    return;
+  }
   deleteNode(nodePopupNode.id);
 }
 
@@ -586,7 +780,10 @@ function deleteNodeFromPopup() {
 //  LINK CRUD
 // ═══════════════════════════════════════════
 function startLinkMode() {
-  if (nodes.length < 2) { showStatus('Нужно минимум 2 узла', false); return; }
+  if (nodes.length < 2) {
+    showStatus('Нужно минимум 2 узла', false);
+    return;
+  }
   currentLinkType = 'physical';
   updateLinkTypePicker();
   showLinkTypePicker();
@@ -594,7 +791,9 @@ function startLinkMode() {
 }
 
 function showLinkTypePicker() {
-  if (!linkTypePicker) return;
+  if (!linkTypePicker) {
+    return;
+  }
   linkTypePicker.style.left = '50%';
   linkTypePicker.style.top = 'auto';
   linkTypePicker.style.transform = 'translateX(-50%)';
@@ -604,12 +803,16 @@ function showLinkTypePicker() {
 }
 
 function hideLinkTypePicker() {
-  if (linkTypePicker) linkTypePicker.classList.remove('open');
+  if (linkTypePicker) {
+    linkTypePicker.classList.remove('open');
+  }
 }
 
 function updateLinkTypePicker() {
-  if (!linkTypePicker) return;
-  linkTypePicker.querySelectorAll('.lt-btn').forEach(btn => {
+  if (!linkTypePicker) {
+    return;
+  }
+  linkTypePicker.querySelectorAll('.lt-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.type === currentLinkType);
   });
 }
@@ -621,65 +824,97 @@ function pickLinkType(type) {
 
 function editLink() {
   linkPopup.classList.remove('open');
-  if (!editingLink) return;
-  const n1 = nodes.find(n => n.id === editingLink.source);
-  const n2 = nodes.find(n => n.id === editingLink.target);
-  document.getElementById('link-modal-title').textContent = `Связь: ${n1?.label || '?'} ↔ ${n2?.label || '?'}`;
+  if (!editingLink) {
+    return;
+  }
+  const n1 = nodes.find((n) => n.id === editingLink.source);
+  const n2 = nodes.find((n) => n.id === editingLink.target);
+  document.getElementById('link-modal-title').textContent =
+    `Связь: ${n1?.label || '?'} ↔ ${n2?.label || '?'}`;
   document.getElementById('lm-type').value = editingLink.type;
   document.getElementById('lm-label').value = editingLink.label || '';
   document.getElementById('lm-details').value = editingLink.details || '';
   document.getElementById('link-modal').classList.add('open');
 }
 
-function closeLinkModal() { document.getElementById('link-modal').classList.remove('open'); editingLink = null; }
+function closeLinkModal() {
+  document.getElementById('link-modal').classList.remove('open');
+  editingLink = null;
+}
 
 function saveLinkModal() {
-  if (!editingLink) return;
+  if (!editingLink) {
+    return;
+  }
   editingLink.type = document.getElementById('lm-type').value;
   editingLink.label = document.getElementById('lm-label').value.trim();
   editingLink.details = document.getElementById('lm-details').value.trim();
-  closeLinkModal(); saveMap(); renderAll(); showStatus('Связь обновлена', true);
+  closeLinkModal();
+  saveMap();
+  renderAll();
+  showStatus('Связь обновлена', true);
 }
 
 function deleteLink() {
   linkPopup.classList.remove('open');
-  if (!editingLink) return;
-  const n1 = nodes.find(n => n.id === editingLink.source);
-  const n2 = nodes.find(n => n.id === editingLink.target);
-  if (!confirm(`Удалить связь ${n1?.label || '?'} → ${n2?.label || '?'}`)) return;
-  links = links.filter(l => l.id !== editingLink.id);
-  editingLink = null; saveMap(); renderAll(); showStatus('Связь удалена', true);
+  if (!editingLink) {
+    return;
+  }
+  const n1 = nodes.find((n) => n.id === editingLink.source);
+  const n2 = nodes.find((n) => n.id === editingLink.target);
+  if (!confirm(`Удалить связь ${n1?.label || '?'} → ${n2?.label || '?'}`)) {
+    return;
+  }
+  links = links.filter((l) => l.id !== editingLink.id);
+  editingLink = null;
+  saveMap();
+  renderAll();
+  showStatus('Связь удалена', true);
 }
 
 // ═══════════════════════════════════════════
 //  ZOOM / PAN
 // ═══════════════════════════════════════════
 function zoomIn() {
-  const oldZoom = zoom; zoom = Math.min(3, zoom * 1.2);
+  const oldZoom = zoom;
+  zoom = Math.min(3, zoom * 1.2);
   const wSize = wrap.getBoundingClientRect();
   panX = wSize.width / 2 - (wSize.width / 2 - panX) * (zoom / oldZoom);
   panY = wSize.height / 2 - (wSize.height / 2 - panY) * (zoom / oldZoom);
-  updateViewport(); updateMinimap();
+  updateViewport();
+  updateMinimap();
 }
 function zoomOut() {
-  const oldZoom = zoom; zoom = Math.max(0.2, zoom / 1.2);
+  const oldZoom = zoom;
+  zoom = Math.max(0.2, zoom / 1.2);
   const wSize = wrap.getBoundingClientRect();
   panX = wSize.width / 2 - (wSize.width / 2 - panX) * (zoom / oldZoom);
   panY = wSize.height / 2 - (wSize.height / 2 - panY) * (zoom / oldZoom);
-  updateViewport(); updateMinimap();
+  updateViewport();
+  updateMinimap();
 }
-function resetView() { panX = 0; panY = 0; zoom = 1; updateViewport(); updateMinimap(); }
+function resetView() {
+  panX = 0;
+  panY = 0;
+  zoom = 1;
+  updateViewport();
+  updateMinimap();
+}
 
 // ═══════════════════════════════════════════
 //  SHUTDOWN
 // ═══════════════════════════════════════════
 async function shutdownServer() {
-  if (!confirm('Завершить работу сервера?')) return;
+  if (!confirm('Завершить работу сервера?')) {
+    return;
+  }
   try {
     await fetch('/api/shutdown', { method: 'POST' });
-    document.body.innerHTML = '<h1 style="color:#eee;text-align:center;margin-top:40vh;">Сервер остановлен</h1>';
+    document.body.innerHTML =
+      '<h1 style="color:#eee;text-align:center;margin-top:40vh;">Сервер остановлен</h1>';
   } catch {
-    document.body.innerHTML = '<h1 style="color:#eee;text-align:center;margin-top:40vh;">Сервер остановлен</h1>';
+    document.body.innerHTML =
+      '<h1 style="color:#eee;text-align:center;margin-top:40vh;">Сервер остановлен</h1>';
   }
 }
 
@@ -691,33 +926,48 @@ function exportMap() {
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'network-map-' + new Date().toISOString().slice(0, 10) + '.json';
-  a.click(); URL.revokeObjectURL(url);
+  a.href = url;
+  a.download = 'network-map-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
   showStatus('Карта экспортирована', true);
 }
 
 function importMap(event) {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file) {
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      nodes = data.nodes || []; links = data.links || [];
-      saveMap(); renderAll(); showStatus('Карта импортирована', true);
-    } catch { showStatus('Ошибка чтения файла', false); }
+      nodes = data.nodes || [];
+      links = data.links || [];
+      saveMap();
+      renderAll();
+      showStatus('Карта импортирована', true);
+    } catch {
+      showStatus('Ошибка чтения файла', false);
+    }
   };
-  reader.readAsText(file); event.target.value = '';
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 async function exportNebulaConfig() {
   showStatus('Экспорт в nebula-config...', false);
   try {
     const res = await fetch('/api/export/nebula');
-    if (!res.ok) throw new Error('Export failed');
+    if (!res.ok) {
+      throw new Error('Export failed');
+    }
     const data = await res.json();
-    if (data.ok) showStatus('Конфиг сохранён: config-nebula.yaml', true);
-    else throw new Error(data.error || 'Export failed');
+    if (data.ok) {
+      showStatus('Конфиг сохранён: config-nebula.yaml', true);
+    } else {
+      throw new Error(data.error || 'Export failed');
+    }
   } catch (e) {
     showStatus('Ошибка экспорта: ' + e.message, false);
   }
@@ -730,8 +980,8 @@ let netSettings = { 'net-name': 'my-vpn-network', dev: 'nebula1' };
 
 function openNetSettings() {
   fetch('/api/settings')
-    .then(r => r.json())
-    .then(s => {
+    .then((r) => r.json())
+    .then((s) => {
       document.getElementById('ns-net-name').value = s['net-name'] || '';
       document.getElementById('ns-dev').value = s.dev || '';
     })
@@ -762,11 +1012,22 @@ function saveNetSettings() {
 //  KEYBOARD
 // ═══════════════════════════════════════════
 document.addEventListener('keydown', (e) => {
-  if (document.querySelector('.modal-overlay.open')) return;
-  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedNodeId && !e.target.closest('input,textarea,select')) {
+  if (document.querySelector('.modal-overlay.open')) {
+    return;
+  }
+  if (
+    (e.key === 'Delete' || e.key === 'Backspace') &&
+    selectedNodeId &&
+    !e.target.closest('input,textarea,select')
+  ) {
     deleteNode(selectedNodeId);
   }
-  if (e.key === 'Escape') { closeNetSettings(); closeNodeModal(); closeLinkModal(); clearLinkPreview(); }
+  if (e.key === 'Escape') {
+    closeNetSettings();
+    closeNodeModal();
+    closeLinkModal();
+    clearLinkPreview();
+  }
 });
 
 // ═══════════════════════════════════════════

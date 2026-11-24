@@ -12,13 +12,13 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 // MIME types
 const MIME = {
   '.html': 'text/html; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
-  '.png':  'image/png',
-  '.svg':  'image/svg+xml',
-  '.ico':  'image/x-icon',
-  '.txt':  'text/plain; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
 const fastify = Fastify({ logger: true });
@@ -88,28 +88,50 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   for (const n of nodes) {
     // Только компьютеры, сервера, телефоны и хранилища
     const allowedTypes = ['server', 'pc', 'phone', 'storage'];
-    if (!allowedTypes.includes(n.type)) continue;
+    if (!allowedTypes.includes(n.type)) {
+      continue;
+    }
 
-    let name = (n.label || 'unnamed').replace(/[^a-zA-Z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-    if (!name) continue;
+    let name = (n.label || 'unnamed')
+      .replace(/[^a-zA-Z0-9-_]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    if (!name) {
+      continue;
+    }
 
     const entry = {};
-    if (n.groups && Array.isArray(n.groups) && n.groups.length) entry.groups = n.groups;
+    if (n.groups && Array.isArray(n.groups) && n.groups.length) {
+      entry.groups = n.groups;
+    }
 
     const nebula_ip = {};
-    if (n.ip_nebula) nebula_ip.ipv4 = n.ip_nebula.split('/')[0] + '/24';
-    if (n.ipv6_nebula) nebula_ip.ipv6 = n.ipv6_nebula.split('/')[0] + '/64';
-    if (Object.keys(nebula_ip).length) entry['nebula_ip'] = nebula_ip;
-    if (n.ip_public) entry.public_ip = n.ip_public;
+    if (n.ip_nebula) {
+      nebula_ip.ipv4 = n.ip_nebula.split('/')[0] + '/24';
+    }
+    if (n.ipv6_nebula) {
+      nebula_ip.ipv6 = n.ipv6_nebula.split('/')[0] + '/64';
+    }
+    if (Object.keys(nebula_ip).length) {
+      entry['nebula_ip'] = nebula_ip;
+    }
+    if (n.ip_public) {
+      entry.public_ip = n.ip_public;
+    }
     if (n.port_nebula) {
       const parsedPort = parseInt(n.port_nebula, 10);
-      if (!isNaN(parsedPort)) entry.port = parsedPort;
+      if (!isNaN(parsedPort)) {
+        entry.port = parsedPort;
+      }
     }
 
     if (hosts[name]) {
       let suff = 2;
       let newName = name + '-' + suff;
-      while (hosts[newName]) { suff++; newName = name + '-' + suff; }
+      while (hosts[newName]) {
+        suff++;
+        newName = name + '-' + suff;
+      }
       name = newName;
     }
     hosts[name] = entry;
@@ -156,7 +178,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
       yaml += '  - ' + h['nebula_ip'].ipv4.split('/')[0] + '\n';
     }
   }
-  if (lighthouses.length === 0) yaml += '  # добавьте lighthouse IP выше\n';
+  if (lighthouses.length === 0) {
+    yaml += '  # добавьте lighthouse IP выше\n';
+  }
   yaml += '\n';
 
   yaml += '# ----------------------------------------------------------\n';
@@ -167,14 +191,24 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     for (const name of lighthouses) {
       const h = hosts[name];
       yaml += '  ' + name + ':\n';
-      if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
+      if (h.groups) {
+        yaml += '    groups: ' + h.groups.join(',') + '\n';
+      }
       if (h['nebula_ip']) {
         yaml += '    nebula_ip:\n';
-        if (h['nebula_ip'].ipv4) yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
-        if (h['nebula_ip'].ipv6) yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+        if (h['nebula_ip'].ipv4) {
+          yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
+        }
+        if (h['nebula_ip'].ipv6) {
+          yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+        }
       }
-      if (h.port) yaml += '    port: ' + h.port + '\n';
-      if (h.public_ip) yaml += '    public_ip: ' + h.public_ip + '\n';
+      if (h.port) {
+        yaml += '    port: ' + h.port + '\n';
+      }
+      if (h.public_ip) {
+        yaml += '    public_ip: ' + h.public_ip + '\n';
+      }
       yaml += '    am_relay: true\n';
       yaml += '\n';
     }
@@ -190,17 +224,29 @@ fastify.get('/api/export/nebula', async (request, reply) => {
   yaml += 'hosts:\n';
   for (const [name, h] of Object.entries(hosts)) {
     // Пропускаем lighthouse — он уже в секции lighthouse
-    if (h.am_lh) continue;
+    if (h.am_lh) {
+      continue;
+    }
     yaml += '  # Host\n';
     yaml += '  ' + name + ':\n';
-    if (h.groups) yaml += '    groups: ' + h.groups.join(',') + '\n';
+    if (h.groups) {
+      yaml += '    groups: ' + h.groups.join(',') + '\n';
+    }
     if (h['nebula_ip']) {
       yaml += '    nebula_ip:\n';
-      if (h['nebula_ip'].ipv4) yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
-      if (h['nebula_ip'].ipv6) yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+      if (h['nebula_ip'].ipv4) {
+        yaml += '      ipv4: ' + h['nebula_ip'].ipv4 + '\n';
+      }
+      if (h['nebula_ip'].ipv6) {
+        yaml += '      ipv6: ' + h['nebula_ip'].ipv6 + '\n';
+      }
     }
-    if (h.public_ip) yaml += '    public_ip: ' + h.public_ip + '\n';
-    if (h.port !== undefined) yaml += '    port: ' + h.port + '\n';
+    if (h.public_ip) {
+      yaml += '    public_ip: ' + h.public_ip + '\n';
+    }
+    if (h.port !== undefined) {
+      yaml += '    port: ' + h.port + '\n';
+    }
     yaml += '\n';
   }
 
@@ -220,10 +266,18 @@ fastify.post('/api/settings', async (request, reply) => {
   }
   const settingsFile = join(__dirname, 'network-settings.json');
   try {
-    writeFileSync(settingsFile, JSON.stringify({
-      'net-name': body['net-name'] || 'my-vpn-network',
-      dev: body.dev || 'nebula1',
-    }, null, 2), 'utf-8');
+    writeFileSync(
+      settingsFile,
+      JSON.stringify(
+        {
+          'net-name': body['net-name'] || 'my-vpn-network',
+          dev: body.dev || 'nebula1',
+        },
+        null,
+        2
+      ),
+      'utf-8'
+    );
     return { ok: true };
   } catch (err) {
     reply.code(500);
@@ -251,9 +305,13 @@ fastify.get('/api/settings', async () => {
 // Serve static files manually
 fastify.get('/*', async (request, reply) => {
   let filePath = request.url.split('?')[0]; // strip query params
-  if (filePath === '/') filePath = 'index.html';
+  if (filePath === '/') {
+    filePath = 'index.html';
+  }
   // Strip leading slash for path.join
-  if (filePath.startsWith('/')) filePath = filePath.slice(1);
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1);
+  }
 
   // Prevent path traversal
   const resolved = resolve(PUBLIC_DIR, filePath);
@@ -270,7 +328,9 @@ fastify.get('/*', async (request, reply) => {
   }
 
   reply.header('Cache-Control', 'no-cache');
-  if (ext === '.js' || ext === '.html') reply.header('Cache-Control', 'no-cache');
+  if (ext === '.js' || ext === '.html') {
+    reply.header('Cache-Control', 'no-cache');
+  }
   reply.type(MIME[ext] || 'application/octet-stream');
   return reply.send(createReadStream(fullPath));
 });
