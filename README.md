@@ -35,6 +35,7 @@ cd network-map
 | Порт Nebula | Порт прослушивания (0 = за NAT, 4242 = публичный) |
 | Публичный IP | Внешний IP (для hole-punch) |
 | Локальный IP | Локальный IP (не из Nebula) |
+| SSH target | SSH-адрес для автодеплоя (root@192.168.1.10:/etc/nebula) |
 | Groups | Группы доступа через запятую (home,ssh) |
 | Описание | Произвольное описание |
 
@@ -66,7 +67,7 @@ Lighthouse/Relay: чекбокс «Lighthouse / Relay» в модалке узл
 - `relay_servers` — IP всех lighthouse
 - `lighthouse` — секция с am_relay
 - `hosts` — все узлы (lighthouse не дублируется)
-- Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port
+- Каждый хост: groups, nebula_ip (ipv4/ipv6), public_ip, port, ssh_target
 - Файл сохраняется на сервере как `config-nebula.yaml`
 
 ## Структура

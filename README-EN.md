@@ -35,6 +35,7 @@ Each node contains:
 | Nebula Port | Listen port (0 = behind NAT, 4242 = public) |
 | Public IP | External IP (for hole-punch) |
 | Local IP | Local non-Nebula IP |
+| SSH Target | SSH address for auto-deploy (root@192.168.1.10:/etc/nebula) |
 | Groups | Access groups comma-separated (home,ssh) |
 | Description | Free-text description |
 
@@ -66,7 +67,7 @@ Deletion: click red ✕ on link.
 - `relay_servers` — all lighthouse IPs
 - `lighthouse` — section with am_relay
 - `hosts` — all nodes (lighthouse not duplicated)
-- Each host: groups, nebula_ip (ipv4/ipv6), public_ip, port
+- Each host: groups, nebula_ip (ipv4/ipv6), public_ip, port, ssh_target
 - File saved on server as `config-nebula.yaml`
 
 ## Structure
