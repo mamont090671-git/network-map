@@ -209,6 +209,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
       if (h.public_ip) {
         yaml += '    public_ip: ' + h.public_ip + '\n';
       }
+      if (h.ssh_target) {
+        yaml += '    ssh_target: ' + h.ssh_target + '\n';
+      }
       yaml += '    am_relay: true\n';
       yaml += '\n';
     }
@@ -246,6 +249,9 @@ fastify.get('/api/export/nebula', async (request, reply) => {
     }
     if (h.port !== undefined) {
       yaml += '    port: ' + h.port + '\n';
+    }
+    if (h.ssh_target) {
+      yaml += '    ssh_target: ' + h.ssh_target + '\n';
     }
     yaml += '\n';
   }

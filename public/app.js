@@ -647,6 +647,7 @@ function openAddNode() {
   document.getElementById('nm-is-lh').checked = false;
   document.getElementById('nm-ip-public').value = '';
   document.getElementById('nm-ip-local').value = '';
+  document.getElementById('nm-ssh-target').value = '';
   document.getElementById('nm-desc').value = '';
   document.getElementById('node-modal').classList.add('open');
   document.getElementById('nm-label').focus();
@@ -668,6 +669,7 @@ function openEditNode(id) {
   document.getElementById('nm-is-lh').checked = !!n.is_lh;
   document.getElementById('nm-ip-public').value = n.ip_public || '';
   document.getElementById('nm-ip-local').value = n.ip_local || '';
+  document.getElementById('nm-ssh-target').value = n.ssh_target || '';
   document.getElementById('nm-desc').value = n.desc || '';
   document.getElementById('node-modal').classList.add('open');
   document.getElementById('nm-label').focus();
@@ -688,6 +690,7 @@ function saveNodeModal() {
   const port_nebula = document.getElementById('nm-port-nebula').value.trim();
   const ip_public = document.getElementById('nm-ip-public').value.trim();
   const ip_local = document.getElementById('nm-ip-local').value.trim();
+  const ssh_target = document.getElementById('nm-ssh-target').value.trim();
   const desc = document.getElementById('nm-desc').value.trim();
   if (editingNode) {
     editingNode.label = label;
@@ -704,6 +707,7 @@ function saveNodeModal() {
     editingNode.is_lh = is_lh;
     editingNode.ip_public = ip_public;
     editingNode.ip_local = ip_local;
+    editingNode.ssh_target = ssh_target;
     editingNode.desc = desc;
     showStatus('Узел обновлён', true);
   } else {
@@ -726,6 +730,7 @@ function saveNodeModal() {
       is_lh,
       ip_public,
       ip_local,
+      ssh_target,
       desc,
       x: snap(cx),
       y: snap(cy),
