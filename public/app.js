@@ -176,9 +176,9 @@ function renderLinks() {
     } else {
       // Вертикальная: отклонение по X
       const offset = Math.max(40, absDx * 0.3);
-      cp1x = src.x + (link.sourceSide === 'left' ? -offset : offset);
+      cp1x = src.x + (link.sourceSide === 'left' ? -offset : (link.sourceSide === 'right' ? offset : 0));
       cp1y = src.y + dy * 0.4;
-      cp2x = tgt.x + (link.targetSide === 'left' ? -offset : offset);
+      cp2x = tgt.x + (link.targetSide === 'left' ? -offset : (link.targetSide === 'right' ? offset : 0));
       cp2y = tgt.y - dy * 0.4;
     }
     const d = `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
