@@ -6,6 +6,23 @@ let links = [];
 let panX = 0,
   panY = 0,
   zoom = 1;
+
+function saveViewport() {
+  try {
+    localStorage.setItem('nm-viewport', JSON.stringify({ panX, panY, zoom }));
+  } catch {}
+}
+
+function loadViewport() {
+  try {
+    const v = JSON.parse(localStorage.getItem('nm-viewport'));
+    if (v && typeof v.panX === 'number' && typeof v.panY === 'number' && typeof v.zoom === 'number') {
+      panX = v.panX;
+      panY = v.panY;
+      zoom = v.zoom;
+    }
+  } catch {}
+}
 let dragNode = null,
   dragOffX = 0,
   dragOffY = 0;
@@ -107,6 +124,7 @@ async function loadMap() {
     const data = await res.json();
     nodes = data.nodes || [];
     links = data.links || [];
+    loadViewport();
     renderAll();
     showStatus('Карта загружена', true);
   } catch (e) {
@@ -575,6 +593,7 @@ document.addEventListener('mouseup', (e) => {
     saveMap();
     dragNode = null;
   }
+  saveViewport();
 });
 
 wrap.addEventListener(
@@ -590,6 +609,7 @@ wrap.addEventListener(
     panY = my - (my - panY) * (zoom / oldZoom);
     updateViewport();
     updateMinimap();
+    saveViewport();
   },
   { passive: false }
 );
@@ -888,6 +908,7 @@ function zoomIn() {
   panY = wSize.height / 2 - (wSize.height / 2 - panY) * (zoom / oldZoom);
   updateViewport();
   updateMinimap();
+  saveViewport();
 }
 function zoomOut() {
   const oldZoom = zoom;
@@ -897,6 +918,7 @@ function zoomOut() {
   panY = wSize.height / 2 - (wSize.height / 2 - panY) * (zoom / oldZoom);
   updateViewport();
   updateMinimap();
+  saveViewport();
 }
 function resetView() {
   panX = 0;
@@ -904,6 +926,7 @@ function resetView() {
   zoom = 1;
   updateViewport();
   updateMinimap();
+  saveViewport();
 }
 
 // ═══════════════════════════════════════════
