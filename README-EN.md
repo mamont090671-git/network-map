@@ -16,6 +16,10 @@ cd network-map
 
 Server runs on `http://127.0.0.1:3000` (localhost only).
 
+### Map viewport persistence
+
+Pan position and zoom level are automatically saved to browser `localStorage` and restored on page reload. The **↺ Reset** button restores the default view.
+
 ## Screenshot
 
 ![Network Map — Nebula network topology visualization](screenshots/network-map-full.png)
