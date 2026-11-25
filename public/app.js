@@ -1,3 +1,5 @@
+/* global localStorage */
+
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
@@ -10,18 +12,27 @@ let panX = 0,
 function saveViewport() {
   try {
     localStorage.setItem('nm-viewport', JSON.stringify({ panX, panY, zoom }));
-  } catch {}
+  } catch {
+    /* noop */
+  }
 }
 
 function loadViewport() {
   try {
     const v = JSON.parse(localStorage.getItem('nm-viewport'));
-    if (v && typeof v.panX === 'number' && typeof v.panY === 'number' && typeof v.zoom === 'number') {
+    if (
+      v &&
+      typeof v.panX === 'number' &&
+      typeof v.panY === 'number' &&
+      typeof v.zoom === 'number'
+    ) {
       panX = v.panX;
       panY = v.panY;
       zoom = v.zoom;
     }
-  } catch {}
+  } catch {
+    /* noop */
+  }
 }
 let dragNode = null,
   dragOffX = 0,
